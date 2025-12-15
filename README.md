@@ -13,8 +13,8 @@ This repository contains the configuration and analysis scripts for a NEMO (Nucl
 
 ## Experiment Description
 
-The experiment is designed to simulate a Kelvin wave propagating in a rectangular basin. Key configurations include:
-- **Domain**: Idealized rectangular basin with flat bottom (defined in `usrdef_zgr.F90`).
+The experiment is designed to simulate a Kelvin wave propagating in an **idealized basin representing the Adriatic Sea**. Key configurations include:
+- **Domain**: Idealized rectangular basin with flat bottom (defined in `usrdef_zgr.F90`), mimicking the Adriatic geometry.
 - **Forcing**: Initial SSH perturbation (Gaussian bump) or tidal forcing (defined in `usrdef_istate.F90` or `usrdef_sbc.F90`).
 - **Physics**: Linear free surface, no wind stress (unless modified).
 
