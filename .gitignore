@@ -1,0 +1,31 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# NEMO/Fortran Build artifacts
+TIDES/BLD/
+TIDES/WORK/
+*.mod
+*.o
+*.fcm
+
+# Output and Log files
+*.out
+*.err
+*.log
+
+# NetCDF Data files (usually large)
+*.nc
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.ipynb_checkpoints/
+
+# Images/Plots (generated)
+*.png
+*.jpg
+*.jpeg
+*.pdf
