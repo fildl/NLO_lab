@@ -4,138 +4,136 @@ import numpy as np
 import os
 
 # Settings
-exp_dir = '/Users/filippodiludovico/Library/Mobile Documents/com~apple~CloudDocs/Uni/NLO/03_tides/postprocessing/experiments'
-files = {
-    'REF': ('EXP_REF_Baseline.nc', 0.05),
-    'AMP05': ('EXP_AMP_0.5m.nc', 0.5),
-    'AMP10': ('EXP_AMP_1.0m.nc', 1.0)
-}
-meshpath = os.path.join(exp_dir, '../mesh_mask.nc') # Assuming mesh mask is in postprocessing root
+script_dir = os.path.dirname(os.path.abspath(__file__))
+exp_dir = os.path.join(script_dir, 'experiments', 'zsigma_20km')
+# Mesh mask path - assuming it's in experiments root or similar. 
+# Adjust as per actual structure: postprocessing/experiments/mesh_mask.nc ??
+# Based on check, mesh_mask_REF.nc might be in experiments/
+meshpath = os.path.join(script_dir, 'experiments', 'mesh_mask.nc')
 
-def compare_runs():
+files = {
+    'AMP0.1': ('EXP_AMP_0.1m.nc', 0.1),
+    'AMP0.5': ('EXP_AMP_0.5m.nc', 0.5),
+    'AMP1.0': ('EXP_AMP_1.0m.nc', 1.0)
+}
+
+def compare_runs_20km():
     data = {}
     
     # Load Data
     for key, (fname, amp0) in files.items():
         fpath = os.path.join(exp_dir, fname)
         if not os.path.exists(fpath):
-            print(f"Missing {fname}")
+            print(f"Missing {fname} at {fpath}")
             continue
             
         ds = netCDF4.Dataset(fpath)
         ssh = ds.variables['sossheig'][:]
         data[key] = {
             'ssh': ssh,
-            'norm_ssh': ssh / amp0, # Normalized by initial amplitude
+            'norm_ssh': ssh / amp0, 
             'amp0': amp0
         }
         ds.close()
 
-    if len(data) < 2:
-        print("Not enough data to compare.")
-        return
+    # Load Coordinates from the first available file
+    lon, lat = None, None
+    for key, (fname, _) in files.items():
+        fpath = os.path.join(exp_dir, fname)
+        if os.path.exists(fpath):
+            ds = netCDF4.Dataset(fpath)
+            if 'nav_lon' in ds.variables:
+                lon = ds.variables['nav_lon'][:]
+                lat = ds.variables['nav_lat'][:]
+            ds.close()
+            break
+            
+    if lon is None:
+        print("Warning: Could not load coordinates. Maps will use indices.")
+        # Fallback to indices
+        ssh_shape = data[list(data.keys())[0]]['ssh'].shape
+        lat, lon = np.meshgrid(np.arange(ssh_shape[1]), np.arange(ssh_shape[2]), indexing='ij')
+        extent = None
+    else:
+        # Calculate bounds for tight plotting
+        lon_min, lon_max = lon.min(), lon.max()
+        lat_min, lat_max = lat.min(), lat.max()
+        extent = [lon_min, lon_max, lat_min, lat_max]
 
-    # Load Mask if available
-    try:
-        mds = netCDF4.Dataset(meshpath)
-        tmask = mds.variables['tmask'][0,0,:,:]
-        mds.close()
-    except:
-        tmask = np.ones_like(data['REF']['ssh'][0])
+    # Global Style Settings
+    plt.rcParams.update({'font.size': 12, 'axes.titlesize': 14, 'axes.labelsize': 12})
 
-    # --- 1. Linearity Check (Time Series at "Venice" - North End) ---
-    # Find a point at the North end (max J, mid I)
-    ny, nx = tmask.shape
-    j_venice = ny - 5
-    i_venice = nx // 2 
-    # Refine point: ensure it is wet
-    while tmask[j_venice, i_venice] == 0 and j_venice > 0:
-        j_venice -= 1
+    # --- 1. Linearity Check (Time Series at Northern End) ---
+    j_venice = data[list(data.keys())[0]]['ssh'].shape[1] - 5
+    i_venice = data[list(data.keys())[0]]['ssh'].shape[2] // 2 
     
-    print(f"Monitoring Point (Venice): J={j_venice}, I={i_venice}")
+    print(f"Monitoring Point (North): J={j_venice}, I={i_venice}")
 
-    plt.figure(figsize=(12, 6))
+    plt.figure(figsize=(10, 6))
     for key, d in data.items():
         ts = d['norm_ssh'][:, j_venice, i_venice]
         time_axis = np.arange(len(ts)) * 60 / 3600 # hours
-        plt.plot(time_axis, ts, label=f"{key} (Normalized by A0={d['amp0']}m)")
+        plt.plot(time_axis, ts, label=f"{key} (Normalized)", linewidth=2)
     
-    plt.title('Normalized SSH at Northern End (Venice)')
+    plt.title('Normalized SSH at Northern Basin End')
     plt.xlabel('Time (hours)')
     plt.ylabel('SSH / A0')
-    plt.grid(True)
+    plt.grid(True, alpha=0.3)
     plt.legend()
-    plt.savefig('comparison_linearity_timeseries.png')
-    print("Saved comparison_linearity_timeseries.png")
+    plt.tight_layout()
+    plt.savefig(os.path.join(script_dir, 'fig_compare_linearity.png'), dpi=300)
+    print(f"Saved {os.path.join(script_dir, 'fig_compare_linearity.png')}")
 
-
-    # --- 2. Hovmöller Comparison (East Coast) ---
-    print("Generating Hovmoller...")
-    # Find East Coast Indices
-    east_coast_idx = []
-    for j in range(ny):
-        found = False
-        for i in range(nx-1, -1, -1):
-            if tmask[j, i] == 1:
-                east_coast_idx.append(i)
-                found = True
-                break
-        if not found:
-            # Fallback if no wet point found (shouldn't happen with ones_like)
-            east_coast_idx.append(nx-2) # Use nx-2 instead of nx-1 (avoid likely halo/boundary)
-
-    # Check extracted indices
-    print(f"East Coast indices sample (mid-basin): {east_coast_idx[len(east_coast_idx)//2]}")
-
-    plt.figure(figsize=(10, 8))
-    colors = {'REF': 'black', 'AMP05': 'blue', 'AMP10': 'red'}
-    linestyles = {'REF': '-', 'AMP05': '--', 'AMP10': ':'}
-
-    # Plot contours
-    for key, d in data.items():
-        ssh = d['norm_ssh']
-        hov = np.zeros((ssh.shape[0], ny))
-        for t in range(ssh.shape[0]):
-            for j in range(ny):
-                idx = int(east_coast_idx[j])
-                hov[t, j] = ssh[t, j, idx]
-        
-        # Debug data range
-        print(f" Run {key} Hovmoller Max: {np.nanmax(hov)}, Min: {np.nanmin(hov)}")
-        
-        time_axis = np.arange(ssh.shape[0]) * 60 / 3600
-        dist_axis = np.arange(ny) * 10 # km
-        
-        # Use simple plot of crest position or a low threshold contour
-        # If signal is clean, contour at 0.05 (normalized) should work
-        try:
-            plt.contour(dist_axis, time_axis, hov, levels=[0.05, 0.5], 
-                       colors=colors[key], linestyles=linestyles[key], linewidths=2)
-        except:
-            print(f"Could not plot contour for {key}")
-
-    # Add dummy legend
-    lines = [plt.Line2D([0], [0], color=c, linestyle=l) for c, l in zip(colors.values(), linestyles.values())]
-    plt.legend(lines, list(data.keys()), title="Wave Front (SSH=0.05/0.5 * A0)")
-    
-    plt.xlabel('Distance along Coast (km)')
-    plt.ylabel('Time (hours)')
-    plt.title('Wave Front Propagation Comparison')
-    plt.savefig('comparison_speed_hovmoller.png')
-    print("Saved comparison_speed_hovmoller.png")
-
-    # --- 3. Difference Map (Non-Linearity spatial structure) ---
-    # SSH_1.0_norm - SSH_REF_norm
-    if 'REF' in data and 'AMP10' in data:
-        diff = data['AMP10']['norm_ssh'] - data['REF']['norm_ssh']
+    # --- 2. Difference Map (Non-Linearity) ---
+    if 'AMP0.1' in data and 'AMP1.0' in data:
+        # Difference between Normalized 1.0m and Normalized 0.1m
+        diff = data['AMP1.0']['norm_ssh'] - data['AMP0.1']['norm_ssh']
         diff_var = np.var(diff, axis=0)
         
-        plt.figure(figsize=(6, 8))
-        plt.imshow(diff_var, origin='lower', cmap='inferno')
-        plt.colorbar(label='Variance of Normalized Difference')
-        plt.title('Non-Linearity Map (Where A=1.0 differs from Linear)')
-        plt.savefig('comparison_nonlinearity_map.png')
-        print("Saved comparison_nonlinearity_map.png")
+        plt.figure(figsize=(8, 10))
+        plt.pcolormesh(lon, lat, diff_var, cmap='inferno', shading='auto')
+        plt.colorbar(label='Variance of Norm. Diff ($m^2$)')
+        plt.title('Non-Linearity Map (1.0m vs 0.1m)')
+        plt.xlabel('Longitude (°E)')
+        plt.ylabel('Latitude (°N)')
+        if extent:
+            plt.xlim(extent[0], extent[1])
+            plt.ylim(extent[2], extent[3])
+        plt.axis('equal') # Aspect ratio
+        plt.tight_layout()
+        plt.savefig(os.path.join(script_dir, 'fig_compare_nonlinear_map.png'), dpi=300)
+        print(f"Saved {os.path.join(script_dir, 'fig_compare_nonlinear_map.png')}")
+
+    # --- 3. Variance Map (Amphidromic Point Search) ---
+    ref_run = 'AMP0.5' if 'AMP0.5' in data else 'AMP0.1'
+    
+    # Calculate Variance EXCLUDING the first 2 hours
+    t_start = 120 
+    if data[ref_run]['ssh'].shape[0] > t_start:
+        ssh_slice = data[ref_run]['ssh'][t_start:, :, :]
+        print(f"Calculating variance from step {t_start} onwards")
+    else:
+        ssh_slice = data[ref_run]['ssh'][:]
+        
+    ssh_var = np.var(ssh_slice, axis=0)
+    
+    # Robust scaling: Use 99th percentile
+    vmax = np.percentile(ssh_var, 99)
+    print(f"Variance Map Vmax: {vmax}")
+    
+    plt.figure(figsize=(8, 10))
+    plt.pcolormesh(lon, lat, ssh_var, cmap='viridis', vmax=vmax, shading='auto')
+    plt.colorbar(label='SSH Variance ($m^2$)')
+    plt.title(f'Amphidromic Point Check ({ref_run})')
+    plt.xlabel('Longitude (°E)')
+    plt.ylabel('Latitude (°N)')
+    if extent:
+        plt.xlim(extent[0], extent[1])
+        plt.ylim(extent[2], extent[3])
+    plt.axis('equal')
+    plt.tight_layout()
+    plt.savefig(os.path.join(script_dir, 'fig_compare_amphidromic.png'), dpi=300) 
+    print(f"Saved {os.path.join(script_dir, 'fig_compare_amphidromic.png')}")
 
 if __name__ == "__main__":
-    compare_runs()
+    compare_runs_20km()

@@ -4,10 +4,11 @@ import numpy as np
 import os
 
 # Settings
-work_dir = '/Users/filippodiludovico/Library/Mobile Documents/com~apple~CloudDocs/Uni/NLO/03_tides/postprocessing/experiments'
-filename = 'EXP_REF_Baseline.nc'
+script_dir = os.path.dirname(os.path.abspath(__file__))
+work_dir = os.path.join(script_dir, 'experiments', 'zsigma_20km')
+filename = 'EXP_AMP_0.5m.nc'
 filepath = os.path.join(work_dir, filename)
-# meshpath = os.path.join(work_dir, 'mesh_mask_REF.nc') # Temporarily commented out if missing
+meshpath = os.path.join(work_dir, '..', 'mesh_mask.nc') # Try parent directory
 
 def analyze_wave():
     if not os.path.exists(filepath):
@@ -45,47 +46,57 @@ def analyze_wave():
     # --- 1. Hovmöller Diagram (Index-based) ---
     print("Generating Hovmöller Diagram...")
     ny, nx = ssh.shape[1], ssh.shape[2]
+    
+    # Robust East Coast Path: Track max variance to find the wave
+    # This avoids hitting land or zero-boundary cells
+    ssh_var_2d = np.var(ssh, axis=0)
     east_coast_idx = []
     
     for j in range(ny):
-        found = False
-        for i in range(nx-1, -1, -1):
-            if tmask[j, i] == 1:
-                east_coast_idx.append(i)
-                found = True
-                break
-        if not found:
-            east_coast_idx.append(np.nan)
+        # Search in the eastern half of the domain for the maximum signal
+        # This assumes the Kelvin wave is on the East coast
+        start_search = nx // 2
+        if start_search < nx:
+            # Find index of max variance in this row
+            local_max_idx = np.argmax(ssh_var_2d[j, start_search:])
+            actual_i = start_search + local_max_idx
+            east_coast_idx.append(actual_i)
+        else:
+            east_coast_idx.append(nx-2) # Fallback
 
     hovmoller = np.zeros((ssh.shape[0], ny))
     for t in range(ssh.shape[0]):
         for j in range(ny):
             idx = east_coast_idx[j]
-            if not np.isnan(idx):
-                hovmoller[t, j] = ssh[t, j, int(idx)]
-            else:
-                hovmoller[t, j] = np.nan
+            hovmoller[t, j] = ssh[t, j, int(idx)]
 
     plt.figure(figsize=(10, 8))
+    # Use robust vmin/vmax for visibility
+    h_vmax = np.percentile(np.abs(hovmoller), 99)
+    if h_vmax == 0: h_vmax = 0.05
+    
     plt.imshow(hovmoller, aspect='auto', origin='lower', cmap='RdBu_r', 
+               vmin=-h_vmax, vmax=h_vmax,
                extent=[0, ny*10, 0, ssh.shape[0]*60/3600])
     plt.colorbar(label='SSH (m)')
     plt.xlabel('Distance along Coast (km approx)')
     plt.ylabel('Time (hours)')
-    plt.title('Hovmöller Diagram (East Coast)')
-    plt.savefig('hovmoller_east.png')
-    print("Saved hovmoller_east.png")
+    plt.title('Hovmöller Diagram (East Coast Path)')
+    plt.savefig(os.path.join(script_dir, 'fig_hovmoller_east.png'), dpi=300)
+    print(f"Saved {os.path.join(script_dir, 'fig_hovmoller_east.png')}")
     
     # --- 2. Snapshots (Index-based & Georeferenced) ---
     print("Generating Snapshots...")
-    times_idx = [0, 200, 500, 900]
+    times_idx = [0, 240, 720, 1200]
     
     # Dynamic limit
     vmax = np.max(np.abs(ssh)) * 0.8
     if vmax < 1e-4: vmax = 0.05
 
     # Index-based Plot
-    fig, axes = plt.subplots(1, 4, figsize=(16, 5))
+    # Tall and narrow domain: Use square figure with constrained layout to center plots
+    fig, axes = plt.subplots(1, 4, figsize=(10, 10), constrained_layout=True)
+    
     for i, tidx in enumerate(times_idx):
         if tidx < ssh.shape[0]:
             ax = axes[i]
@@ -93,64 +104,98 @@ def analyze_wave():
             data = np.ma.masked_where(tmask == 0, data)
             im = ax.imshow(data, origin='lower', cmap='RdBu_r', vmin=-vmax, vmax=vmax)
             ax.set_title(f'T = {tidx*60/3600:.1f} h')
-            plt.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
-    plt.tight_layout()
-    plt.savefig('ssh_snapshots_index.png')
-    print("Saved ssh_snapshots_index.png")
+            
+            # Horizontal colorbar for better use of space
+            plt.colorbar(im, ax=ax, fraction=0.046, pad=0.04, orientation='horizontal')
+            
+            ax.set_xlabel('I')
+            if i==0: ax.set_ylabel('J')
+            else: ax.set_yticklabels([])
+            
+    plt.savefig(os.path.join(script_dir, 'fig_ssh_snapshots_index.png'), dpi=300)
+    print(f"Saved {os.path.join(script_dir, 'fig_ssh_snapshots_index.png')}")
 
     # Georeferenced Plot
-    fig, axes = plt.subplots(1, 4, figsize=(18, 6), sharey=True)
-    for i, tidx in enumerate(times_idx):
-        if tidx < ssh.shape[0]:
-            ax = axes[i]
-            data = ssh[tidx, :, :]
-            data = np.ma.masked_where(tmask == 0, data)
-            # Use pcolormesh for georeferencing
-            pcm = ax.pcolormesh(lon, lat, data, cmap='RdBu_r', vmin=-vmax, vmax=vmax, shading='auto')
-            
-            # Coastline removed as requested
-            # ax.contour(lon, lat, tmask, levels=[0.5], colors='black', linewidths=1.5)
-            
-            ax.set_title(f'T = {tidx*60/3600:.1f} h')
-            ax.set_xlabel('Longitude (°E)')
-            if i == 0: ax.set_ylabel('Latitude (°N)')
-            ax.grid(True, linestyle='--', alpha=0.5)
+    print("Generating Georeferenced Snapshots...")
+    # Plot 4 snapshots
+    steps = [0, 240, 720, 1200]
+    fig, axes = plt.subplots(1, 4, figsize=(12, 10), constrained_layout=True)
     
-    # Common colorbar for geo plot
-    # Create a dummy axis for colorbar if needed, or stick to raveled axes
-    # The previous method using axes.ravel().tolist() is robust
-    cb = plt.colorbar(pcm, ax=axes.ravel().tolist(), fraction=0.046, pad=0.04)
-    cb.set_label('SSH (m)')
-    plt.savefig('ssh_snapshots_geo.png')
-    print("Saved ssh_snapshots_geo.png")
+    plt.rcParams.update({'font.size': 12, 'axes.titlesize': 14, 'axes.labelsize': 12})
+    
+    # Calculate bounds (re-check if lon is defined)
+    if 'lon' not in locals() or lon is None: extent = None
+    else:
+        lon_min, lon_max = lon.min(), lon.max()
+        lat_min, lat_max = lat.min(), lat.max()
+        extent = [lon_min, lon_max, lat_min, lat_max]
 
-    # --- 3. Variance Map (Index-based & Georeferenced) ---
-    print("Generating Variance Maps...")
-    ssh_var = np.var(ssh, axis=0)
-    ssh_var = np.ma.masked_where(tmask == 0, ssh_var)
+    for i, t_step in enumerate(steps):
+        if t_step >= ssh.shape[0]: continue
+        ax = axes[i]
+        data_step = ssh[t_step, :, :]
+        
+        if 'lon' in locals() and lon is not None:
+            im = ax.pcolormesh(lon, lat, data_step, cmap='RdBu_r', shading='auto', vmin=-0.1, vmax=0.1)
+            ax.set_xlabel('Lon (°E)')
+            if i == 0: ax.set_ylabel('Lat (°N)')
+            if extent:
+                ax.set_xlim(extent[0], extent[1])
+                ax.set_ylim(extent[2], extent[3])
+            # Adjust aspect ratio
+            ax.set_aspect('equal')
+            if i > 0: ax.set_yticklabels([])
+        else:
+            im = ax.imshow(data_step, origin='lower', cmap='RdBu_r', vmin=-0.1, vmax=0.1)
+            ax.set_xlabel('I')
+            
+        time_hours = t_step * 60 / 3600
+        ax.set_title(f"T = {time_hours:.1f} h")
+
+    fig.suptitle('Kelvin Wave Propagation (SSH)', fontsize=16)
+    # Add shared colorbar
+    fig.colorbar(im, ax=axes, orientation='horizontal', fraction=0.05, pad=0.02, label='SSH (m)')
     
-    # Index-based
-    plt.figure(figsize=(6, 8))
-    plt.imshow(ssh_var, origin='lower', cmap='viridis')
-    plt.colorbar(label='SSH Variance (m^2)')
-    plt.title('SSH Variance (Index coordinates)')
-    plt.savefig('ssh_variance_index.png')
-    print("Saved ssh_variance_index.png")
+    plt.savefig(os.path.join(script_dir, 'fig_ssh_snapshots.png'), dpi=300)
+    print(f"Saved {os.path.join(script_dir, 'fig_ssh_snapshots.png')}")
+
+    # --- 3. Variance Map (Geo) ---
+    print("Generating Variance Map...")
     
-    # Georeferenced
-    plt.figure(figsize=(8, 10))
-    pcm = plt.pcolormesh(lon, lat, ssh_var, cmap='viridis', shading='auto')
-    # plt.contour(lon, lat, tmask, levels=[0.5], colors='black', linewidths=1.5) # Coastline removed
-    plt.colorbar(pcm, label='SSH Variance (m^2)')
-    plt.title('SSH Variance (Minima = Potential Nodes)')
-    plt.xlabel('Longitude (°E)')
-    plt.ylabel('Latitude (°N)')
-    plt.grid(True, linestyle='--', alpha=0.5)
-    plt.savefig('ssh_variance_geo.png')
-    print("Saved ssh_variance_geo.png")
+    t_start = 120 
+    if ssh.shape[0] > t_start:
+        ssh_slice = ssh[t_start:, :, :]
+    else:
+        ssh_slice = ssh[:]
+    
+    ssh_var = np.var(ssh_slice, axis=0)
+    vmax = np.percentile(ssh_var, 99)
+    print(f"Variance Map Vmax: {vmax}")
+
+    # Use subplots with constrained_layout
+    fig, ax = plt.subplots(figsize=(8, 10), constrained_layout=True)
+    
+    if 'lon' in locals() and lon is not None:
+        im = ax.pcolormesh(lon, lat, ssh_var, cmap='viridis', shading='auto', vmax=vmax)
+        ax.set_xlabel('Longitude (°E)')
+        ax.set_ylabel('Latitude (°N)')
+        if extent:
+            ax.set_xlim(extent[0], extent[1])
+            ax.set_ylim(extent[2], extent[3])
+        ax.set_aspect('equal')
+    else:
+        im = ax.imshow(ssh_var, origin='lower', cmap='viridis', vmax=vmax)
+        ax.set_xlabel('I Index')
+        ax.set_ylabel('J Index')
+        
+    fig.colorbar(im, ax=ax, label='SSH Variance ($m^2$)', shrink=0.8)
+    ax.set_title('SSH Variance (Node Identification)')
+    
+    plt.savefig(os.path.join(script_dir, 'fig_ssh_variance.png'), dpi=300)
+    print(f"Saved {os.path.join(script_dir, 'fig_ssh_variance.png')}")
 
     ds.close()
-    mds.close()
+    if 'mds' in locals() and mds: mds.close()
 
 if __name__ == "__main__":
     analyze_wave()
