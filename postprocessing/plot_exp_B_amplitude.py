@@ -4,12 +4,9 @@ import numpy as np
 import os
 
 # Settings
+# Settings
 script_dir = os.path.dirname(os.path.abspath(__file__))
-exp_dir = os.path.join(script_dir, 'experiments', 'zsigma_20km')
-# Mesh mask path - assuming it's in experiments root or similar. 
-# Adjust as per actual structure: postprocessing/experiments/mesh_mask.nc ??
-# Based on check, mesh_mask_REF.nc might be in experiments/
-meshpath = os.path.join(script_dir, 'experiments', 'mesh_mask.nc')
+exp_dir = os.path.join(script_dir, 'experiments')
 
 files = {
     'AMP0.1': ('EXP_AMP_0.1m.nc', 0.1),
@@ -81,8 +78,8 @@ def compare_runs_20km():
     plt.grid(True, alpha=0.3)
     plt.legend()
     plt.tight_layout()
-    plt.savefig(os.path.join(script_dir, 'fig_compare_linearity.png'), dpi=300)
-    print(f"Saved {os.path.join(script_dir, 'fig_compare_linearity.png')}")
+    plt.savefig(os.path.join(script_dir, 'fig_expB_compare_linearity.png'), dpi=300)
+    print(f"Saved {os.path.join(script_dir, 'fig_expB_compare_linearity.png')}")
 
     # --- 2. Difference Map (Non-Linearity) ---
     if 'AMP0.1' in data and 'AMP1.0' in data:
@@ -101,8 +98,8 @@ def compare_runs_20km():
             plt.ylim(extent[2], extent[3])
         plt.axis('equal') # Aspect ratio
         plt.tight_layout()
-        plt.savefig(os.path.join(script_dir, 'fig_compare_nonlinear_map.png'), dpi=300)
-        print(f"Saved {os.path.join(script_dir, 'fig_compare_nonlinear_map.png')}")
+        plt.savefig(os.path.join(script_dir, 'fig_expB_compare_nonlinear_map.png'), dpi=300)
+        print(f"Saved {os.path.join(script_dir, 'fig_expB_compare_nonlinear_map.png')}")
 
     # --- 3. Variance Map (Amphidromic Point Search) ---
     ref_run = 'AMP0.5' if 'AMP0.5' in data else 'AMP0.1'
@@ -132,8 +129,8 @@ def compare_runs_20km():
         plt.ylim(extent[2], extent[3])
     plt.axis('equal')
     plt.tight_layout()
-    plt.savefig(os.path.join(script_dir, 'fig_compare_amphidromic.png'), dpi=300) 
-    print(f"Saved {os.path.join(script_dir, 'fig_compare_amphidromic.png')}")
+    plt.savefig(os.path.join(script_dir, 'fig_expB_compare_amphidromic.png'), dpi=300) 
+    print(f"Saved {os.path.join(script_dir, 'fig_expB_compare_amphidromic.png')}")
 
 if __name__ == "__main__":
     compare_runs_20km()

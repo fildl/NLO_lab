@@ -1,0 +1,70 @@
+\documentclass[a4paper,11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{xcolor}
+
+\geometry{margin=2.5cm}
+
+\title{Riassunto Setup Esperimento TIDES}
+\author{Filippo Di Ludovico}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduzione}
+Questo documento riassume i passaggi eseguiti per configurare l'esperimento \texttt{TIDES}, mirato alla simulazione di onde di Kelvin in un bacino idealizzato (Adriatico).
+
+\section{Struttura delle Directory}
+\begin{itemize}
+    \item \textbf{NEMO Root}: \texttt{/home/STUDENTI/filippo.diludovico/nlo/nemo\_4.2.0}
+    \item \textbf{Configurazione}: \texttt{cfgs/TIDES} (copiata da \texttt{GYRE\_PISCES})
+    \item \textbf{Directory di lavoro}: \texttt{.../Uni/NLO/03\_tides/TIDES/EXP00/tmp\_work}
+\end{itemize}
+
+\section{File Modificati}
+Di seguito il dettaglio delle modifiche apportate in \texttt{MY\_SRC}.
+
+\subsection{usrdef\_hgr.F90 (Griglia Orizzontale)}
+Modificato per definire il dominio Adriatico idealizzato.
+\begin{itemize}
+    \item \textbf{Origine}: 16°E, 40°N
+    \item \textbf{Risoluzione}: $\sim 10$ km (\texttt{nn\_GYRE = 1})
+    \item \textbf{Rotazione}: Nessuna ($\sin \alpha = 0, \cos \alpha = 1$)
+\end{itemize}
+
+\begin{lstlisting}[language=Fortran, frame=single, basicstyle=\small\ttfamily]
+zlam1 = 16._wp
+zphi1 = 40._wp
+ze1 = 10000._wp / REAL( nn_GYRE , wp )
+\end{lstlisting}
+
+\subsection{usrdef\_istate.F90 (Stato Iniziale)}
+Adattato da \texttt{TSUNAMI} per generare una perturbazione Gaussiana dell'SSH.
+\begin{itemize}
+    \item \textbf{Centro}: 19.0°E, 40.5°N (Canale d'Otranto, più a Ovest per evitare confini)
+    \item \textbf{Raggio ($R$)}: 20 km (aggiornato da 50km per segnale più pulito)
+    \item \textbf{Ampiezza ($A_0$)}: Variabile (0.05m, 0.5m, 1.0m)
+\end{itemize}
+
+\subsection{usrdef\_nam.F90 (Dimensioni)}
+Dimensioni del dominio impostate per un rettangolo allungato:
+\begin{lstlisting}[language=Fortran, frame=single, basicstyle=\small\ttfamily]
+kpi = 20 * nn_GYRE + 2  ! Larghezza (x)
+kpj = 100 * nn_GYRE + 2 ! Lunghezza (y)
+\end{lstlisting}
+
+\subsection{usrdef\_sbc.F90 (Forcing)}
+\textbf{Vento Rimosso}: Tutti i termini di stress del vento (\texttt{utau, vtau}) e moduli (\texttt{wndm}) sono stati forzati a 0.0 per isolare la dinamica d'onda.
+
+\section{Aggiornamenti e Fix}
+\begin{enumerate}
+    \item \textbf{Stabilità}: Ridotto timestep (\texttt{rn\_Dt}) a 60 secondi per evitare instabilità CFL.
+    \item \textbf{Biologia}: Disabilitato modulo PISCES (rimosso \texttt{key\_top}) per evitare crash runtime.
+    \item \textbf{Output}: Abilitato \texttt{1ts} nel file XML per salvare ogni timestep.
+\end{enumerate}
+
+\end{document}

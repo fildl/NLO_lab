@@ -1,0 +1,148 @@
+\documentclass[a4paper,11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{amsmath}
+\usepackage{hyperref}
+
+\geometry{margin=2.5cm}
+\graphicspath{ {../} } % Path to figures (one level up in postprocessing)
+
+\title{Diario degli Esperimenti TIDES}
+\author{Filippo Di Ludovico}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduzione}
+Questo documento raccoglie i risultati delle prove di sensibilità effettuate sul modello NEMO per il caso TIDES (propagazione Onda di Kelvin in Adriatico idealizzato).
+L'obiettivo è analizzare la risposta del modello variando parametri come l'ampiezza della perturbazione iniziale.
+
+\section{Experiment A: Baseline (Riferimento)}
+\textbf{Obiettivo:} Stabilire una simulazione stabile.
+\begin{itemize}
+    \item \textbf{Configurazione}: $A_0 = 1.0$m, Batimetria piatta 100m.
+    \item \textbf{Risultato}: Simulazione stabile con timestep 60s.
+\end{itemize}
+
+\section{Experiment B: Amplitude Sensitivity (Linearity Check)}
+\textbf{Obiettivo:} Verificare la linearità della risposta del modello (SSH Output vs Input) e la dipendenza della velocità di fase dall'ampiezza.
+
+\subsection{Configurazione}
+Sono state eseguite tre run con perturbazione Gaussiana ($R=20$ km) centrata a 19.0°E, 40.5°N:
+\begin{itemize}
+    \item \textbf{AMP0.1}: $A_0 = 0.1$ m (Regime Lineare)
+    \item \textbf{AMP0.5}: $A_0 = 0.5$ m
+    \item \textbf{AMP1.0}: $A_0 = 1.0$ m (Regime Alta Ampiezza)
+\end{itemize}
+
+\subsection{Analisi dei Risultati}
+
+\subsubsection{1. Propagazione Spaziale}
+L'onda generata si propaga verso Nord lungo la costa orientale, come previsto per un'onda di Kelvin nell'emisfero Nord. Viene riflessa alla testata del bacino (Nord) e scende lungo la costa Ovest.
+La Figura \ref{fig:snapshots} mostra l'evoluzione temporale dell'SSH.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{fig_ssh_snapshots.png}
+    \caption{Snapshots dell'elevazione superficiale (SSH) a intervalli di ~4 ore. L'onda viaggia in senso antiorario.}
+    \label{fig:snapshots}
+\end{figure}
+
+\subsubsection{2. Verifica della Linearità}
+Abbiamo confrontato le serie temporali dell'SSH registrate a Venezia (Nord del bacino), normalizzate per l'ampiezza iniziale $A_0$.
+Come mostrato in Figura \ref{fig:linearity}, le curve normalizzate sono \textbf{perfettamente sovrapposte}. Questo indica che il modello risponde in modo lineare:
+$$ \frac{\text{SSH}(t)}{A_0} \approx \text{costante} $$
+Non si osservano sfasamenti temporali significativi, suggerendo che la velocità di fase $c = \sqrt{gh}$ non è influenzata dall'ampiezza in questo regime di profondità (100m).
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{fig_compare_linearity.png}
+    \caption{Confronto delle serie temporali normalizzate a Venezia. La sovrapposizione indica una risposta lineare.}
+    \label{fig:linearity}
+\end{figure}
+
+Per quantificare eventuali effetti non lineari, abbiamo calcolato la mappa della varianza della differenza tra i run normalizzati (Figura \ref{fig:nonlinear}). I valori sono trascurabili, confermando la linearità.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{fig_compare_nonlinear_map.png}
+    \caption{Mappa della non-linearità (Differenza tra run normalizzati).}
+    \label{fig:nonlinear}
+\end{figure}
+
+\subsubsection{3. Identificazione del Punto Anfidromico}
+Analizzando la varianza locale dell'SSH nel tempo (Figura \ref{fig:variance}), possiamo identificare i nodi dell'onda stazionaria (o quasi-stazionaria).
+Il minimo di varianza (zona blu scuro) indica la posizione del \textbf{Punto Anfidromico}. Per un bacino rettangolare piatto, ci aspettiamo che si trovi sull'asse centrale.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{fig_ssh_variance.png}
+    \caption{Mappa della varianza SSH. I minimi indicano potenziali punti anfidromici.}
+    \label{fig:variance}
+\end{figure}
+
+\subsubsection{4. Diagramma di Hovmöller}
+Il diagramma di Hovmöller lungo la costa Est (Figura \ref{fig:hovmoller}) conferma la propagazione uniforme verso Nord senza distorsioni significative del fronte d'onda.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{fig_hovmoller_east.png}
+    \caption{Diagramma di Hovmöller lungo la costa orientale.}
+    \label{fig:hovmoller}
+\end{figure}
+
+\section{Conclusioni Esperimento B}
+Il sistema si comporta in modo \textbf{lineare} per perturbazioni fino a 1.0 m su fondale di 100 m. La velocità di propagazione è costante e indipendente dall'ampiezza in questo range.
+
+\section{Experiment C: Bathymetry Sensitivity (Pendenza Adriatica)}
+\textbf{Obiettivo:} Analizzare la propagazione dell'onda di Kelvin su un fondale inclinato, simile a quello reale dell'Adriatico (da 1000m a Sud a 30m a Nord).
+
+\subsection{Configurazione}
+\begin{itemize}
+    \item \textbf{Batimetria}: Pendenza lineare $H(y)$ lungo l'asse Nord-Sud.
+    $$ H(y) = 1000 \text{m (Sud)} \to 30 \text{m (Nord)} $$
+    \item \textbf{Perturbazione}: $A_0 = 0.1$ m (Regime Lineare) centrata a Sud-Est (Canale d'Otranto).
+\end{itemize}
+
+\subsection{Analisi dei Risultati}
+
+\subsubsection{1. Effetto Shoaling (Amplificazione)}
+La teoria prevede che l'ampiezza dell'onda aumenti quando la profondità diminuisce (Legge di Green: $A \propto H^{-1/4}$).
+Confrontando la serie temporale dell'SSH al Nord (Venezia) tra l'esperimento C (30m) e la Baseline (100m) in Figura \ref{fig:shoaling}, osserviamo chiaramente:
+\begin{enumerate}
+    \item \textbf{Amplificazione}: Il picco dell'onda è significativamente più alto nel caso a profondità variabile.
+    \item \textbf{Rallentamento}: L'onda arriva più tardi rispetto al caso a 100m, poiché la velocità di fase $c=\sqrt{gh}$ diminuisce verso Nord.
+\end{enumerate}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{fig_ExpC_shoaling_comparison.png}
+    \caption{Confronto SSH a Nord: Exp C (Rosso, 30m) vs Baseline (Nero, 100m). Evidente lo shoaling e il ritardo di fase.}
+    \label{fig:shoaling}
+\end{figure}
+
+\subsubsection{2. Diagramma di Hovmöller}
+Il diagramma spazio-tempo (Figura \ref{fig:hovmollerC}) mostra la curvatura del fronte d'onda. La pendenza della traccia indica la velocità (distanza/tempo). La pendenza diminuisce andando verso Nord (y crescente), confermando il rallentamento progressivo dell'onda.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{fig_ExpC_hovmoller.png}
+    \caption{Diagramma di Hovmöller per Esperimento C. La curvatura indica la decelerazione verso Nord.}
+    \label{fig:hovmollerC}
+\end{figure}
+
+\subsubsection{3. Evoluzione Spaziale}
+Gli snapshots in Figura \ref{fig:snapshotsC} mostrano l'onda che si "accumula" e cresce mentre risale il bacino.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{fig_ExpC_snapshots.png}
+    \caption{Snapshots Esperimento C. Notare l'aumento di intensità del colore (ampiezza) verso Nord.}
+    \label{fig:snapshotsC}
+\end{figure}
+
+\end{document}

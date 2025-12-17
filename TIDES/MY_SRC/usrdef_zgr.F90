@@ -78,7 +78,8 @@ CONTAINS
       ! ------------------------------------
       CALL zgr_z( pdept_1d, pdepw_1d, pe3t_1d , pe3w_1d )   ! Reference z-coordinate system
       !
-      CALL zgr_msk_top_bot( k_top , k_bot )                 ! masked top and bottom ocean t-level indices
+      !                                                     ! masked top and bottom ocean t-level indices
+      CALL zgr_msk_top_bot( k_top , k_bot, pdepw_1d )       ! NOW PASSING pdepw_1d
       !
       !                                                     ! z-coordinate (3D arrays) from the 1D z-coord.
       CALL zgr_zco( pdept_1d, pdepw_1d, pe3t_1d, pe3w_1d,   &   ! in  : 1D reference vertical coordinate
@@ -174,34 +175,60 @@ CONTAINS
    END SUBROUTINE zgr_z
 
 
-   SUBROUTINE zgr_msk_top_bot( k_top , k_bot )
+   SUBROUTINE zgr_msk_top_bot( k_top , k_bot, pdepw_1d )
       !!----------------------------------------------------------------------
       !!                    ***  ROUTINE zgr_msk_top_bot  ***
       !!
       !! ** Purpose :   set the masked top and bottom ocean t-levels
       !!
-      !! ** Method  :   GYRE case = closed flat box ocean without ocean cavities
-      !!                   k_top = 1     except along north, south, east and west boundaries
-      !!                   k_bot = jpk-1 except along north, south, east and west boundaries
+      !! ** Method  :   TIDES case = Inclined bathymetry
+      !!                Slope from 1000m (South) to 30m (North)
       !!
       !! ** Action  : - k_top : first wet ocean level index
       !!              - k_bot : last  wet ocean level index
       !!----------------------------------------------------------------------
       INTEGER , DIMENSION(:,:), INTENT(out) ::   k_top , k_bot   ! first & last wet ocean level
+      REAL(wp), DIMENSION(:)  , INTENT(in ) ::   pdepw_1d        ! 1D grid-point depth (W-points)
       !
-      REAL(wp), DIMENSION(jpi,jpj) ::   z2d   ! 2D local workspace
+      REAL(wp) :: z_depth_target, z_slope_start, z_slope_end
+      INTEGER  :: ji, jj, jk, ik_bot
       !!----------------------------------------------------------------------
       !
       IF(lwp) WRITE(numout,*)
       IF(lwp) WRITE(numout,*) '    zgr_top_bot : defines the top and bottom wet ocean levels.'
       IF(lwp) WRITE(numout,*) '    ~~~~~~~~~~~'
-      IF(lwp) WRITE(numout,*) '       GYRE case : closed flat box ocean without ocean cavities'
+      IF(lwp) WRITE(numout,*) '       TIDES case : Inclined Bathymetry (1000m -> 30m)'
       !
-      z2d(:,:) = REAL( jpkm1 , wp )                              ! flat bottom
-      !
-      k_bot(:,:) = NINT( z2d(:,:) )          ! =jpkm1 over the ocean point, =0 elsewhere
-      !
-      k_top(:,:) = MIN( 1 , k_bot(:,:) )     ! = 1    over the ocean point, =0 elsewhere
+      z_slope_start = 1000._wp ! Depth at South
+      z_slope_end   = 30._wp   ! Depth at North
+      
+      DO jj = 1, jpj
+         ! Linear Interpolation of depth along latitude (J)
+         z_depth_target = z_slope_start - (z_slope_start - z_slope_end) * REAL(jj - 1, wp) / REAL(jpj - 1, wp)
+         
+         ! Find the deepest level w-level that is less than or equal to z_depth_target
+         ik_bot = 0
+         DO jk = 1, jpk
+            ! pdepw_1d(jk) is the depth of the w-level (interface). 
+            ! We want the fluid to exist down to this level.
+            ! If w-level depth > target, we stop.
+            IF( pdepw_1d(jk) <= z_depth_target ) THEN
+                ik_bot = jk
+            ELSE
+                EXIT
+            END IF
+         END DO
+         
+         ! Safety check to ensure at least 2 levels (surface + 1)
+         ik_bot = MAX( 2, ik_bot )
+         ! Safety check to not exceed max levels
+         ik_bot = MIN( jpk - 1, ik_bot )
+
+         DO ji = 1, jpi
+             k_bot(ji, jj) = ik_bot
+             k_top(ji, jj) = 1       ! Always start at surface
+         END DO
+      END DO
       !
    END SUBROUTINE zgr_msk_top_bot
    

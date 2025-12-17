@@ -5,10 +5,21 @@ import os
 
 # Settings
 script_dir = os.path.dirname(os.path.abspath(__file__))
-work_dir = os.path.join(script_dir, 'experiments', 'zsigma_20km')
-filename = 'EXP_AMP_0.5m.nc'
+# Data is now in 'experiments' directly
+work_dir = os.path.join(script_dir, 'experiments')
+filename = 'EXP_AMP_0.1m.nc' 
 filepath = os.path.join(work_dir, filename)
-meshpath = os.path.join(work_dir, '..', 'mesh_mask.nc') # Try parent directory
+# Mesh mask is expected in postprocessing/mesh/ or experiments/
+# User said they have mesh_mask_C.nc. Let's try to look for it.
+meshpath_candidates = [
+    os.path.join(script_dir, 'mesh', 'mesh_mask_A.nc'),
+    os.path.join(work_dir, 'mesh_mask_A.nc'),
+]
+meshpath = ""
+for p in meshpath_candidates:
+    if os.path.exists(p):
+        meshpath = p
+        break
 
 def analyze_wave():
     if not os.path.exists(filepath):
@@ -20,24 +31,35 @@ def analyze_wave():
     ssh = ds.variables['sossheig'][:]
     
     # Try to load mask
+    tmask = None
     if os.path.exists(meshpath):
-        mds = netCDF4.Dataset(meshpath)
-        tmask = mds.variables['tmask'][0,0,:,:]
-        mds.close()
-        print("Loaded tmask from mesh file.")
-    else:
-        print("Warning: mesh_mask.nc not found. Proceeding without land mask.")
-        tmask = np.ones_like(ssh[0,:,:]) # All 1s (all water assumption)
+        try:
+            with netCDF4.Dataset(meshpath) as mds:
+                temp_mask = mds.variables['tmask'][0,0,:,:]
+            # Check dimensions
+            if temp_mask.shape == ssh[0,:,:].shape:
+                tmask = temp_mask
+                print("Loaded tmask from mesh file.")
+            else:
+                print(f"Warning: Mesh mask dimensions {temp_mask.shape} do not match data {ssh[0,:,:].shape}. Ignoring mesh mask.")
+        except Exception as e:
+            print(f"Warning: Failed to load mesh mask: {e}")
+            
+    if tmask is None:
+        print("Creating synthetic mask (assuming box domain).")
+        tmask = np.ones_like(ssh[0,:,:]) 
+        # Set boundaries to land (0)
+        tmask[0,:] = 0; tmask[-1,:] = 0
+        tmask[:,0] = 0; tmask[:,-1] = 0
     
     # Load Georeferenced Coordinates
     if 'nav_lon' in ds.variables:
         lon = ds.variables['nav_lon'][:]
         lat = ds.variables['nav_lat'][:]
     elif os.path.exists(meshpath):
-        mds = netCDF4.Dataset(meshpath)
-        lon = mds.variables['glamt'][0,:,:]
-        lat = mds.variables['gphit'][0,:,:]
-        mds.close()
+        with netCDF4.Dataset(meshpath) as mds:
+            lon = mds.variables['glamt'][0,:,:]
+            lat = mds.variables['gphit'][0,:,:]
     else:
         # Fallback to simple indices if absolutely nothing available
         print("Warning: No coordinates found. Using indices.")
@@ -82,15 +104,16 @@ def analyze_wave():
     plt.xlabel('Distance along Coast (km approx)')
     plt.ylabel('Time (hours)')
     plt.title('Hovmöller Diagram (East Coast Path)')
-    plt.savefig(os.path.join(script_dir, 'fig_hovmoller_east.png'), dpi=300)
-    print(f"Saved {os.path.join(script_dir, 'fig_hovmoller_east.png')}")
-    
+    plt.savefig(os.path.join(script_dir, 'fig_expA_hovmoller_east.png'), dpi=300)
+    print(f"Saved {os.path.join(script_dir, 'fig_expA_hovmoller_east.png')}")
+
     # --- 2. Snapshots (Index-based & Georeferenced) ---
     print("Generating Snapshots...")
-    times_idx = [0, 240, 720, 1200]
+    # Shifted times to avoid initial perturbation: 4h, 10h, 16h, 22h
+    times_idx = [240, 600, 960, 1320]
     
-    # Dynamic limit
-    vmax = np.max(np.abs(ssh)) * 0.8
+    # Dynamic limit (exclude first 2 hours for scaling)
+    vmax = np.max(np.abs(ssh[120:,:,:])) * 0.8
     if vmax < 1e-4: vmax = 0.05
 
     # Index-based Plot
@@ -112,16 +135,25 @@ def analyze_wave():
             if i==0: ax.set_ylabel('J')
             else: ax.set_yticklabels([])
             
-    plt.savefig(os.path.join(script_dir, 'fig_ssh_snapshots_index.png'), dpi=300)
-    print(f"Saved {os.path.join(script_dir, 'fig_ssh_snapshots_index.png')}")
+    plt.savefig(os.path.join(script_dir, 'fig_expA_ssh_snapshots_index.png'), dpi=300)
+    print(f"Saved {os.path.join(script_dir, 'fig_expA_ssh_snapshots_index.png')}")
 
     # Georeferenced Plot
     print("Generating Georeferenced Snapshots...")
-    # Plot 4 snapshots
-    steps = [0, 240, 720, 1200]
-    fig, axes = plt.subplots(1, 4, figsize=(12, 10), constrained_layout=True)
+    # Plot 5 snapshots from 2h to 16h as requested
+    # 2h = 120 steps, 16h = 960 steps
+    steps = np.linspace(120, 960, 5, dtype=int)
     
-    plt.rcParams.update({'font.size': 12, 'axes.titlesize': 14, 'axes.labelsize': 12})
+    # Calculate robust Vmax from the selected frames ONLY
+    # This ensures colorbar is not saturated by unshown transients
+    selected_ssh = ssh[steps, :, :]
+    vmax_local = np.percentile(np.abs(selected_ssh), 99.9) # Use 99.9 to avoid single pixel spikes
+    print(f"Index-based Vmax: {vmax_local}")
+    
+    # Larger fonts
+    plt.rcParams.update({'font.size': 14, 'axes.titlesize': 16, 'axes.labelsize': 14})
+    
+    fig, axes = plt.subplots(1, 5, figsize=(15, 10), constrained_layout=True)
     
     # Calculate bounds (re-check if lon is defined)
     if 'lon' not in locals() or lon is None: extent = None
@@ -136,7 +168,8 @@ def analyze_wave():
         data_step = ssh[t_step, :, :]
         
         if 'lon' in locals() and lon is not None:
-            im = ax.pcolormesh(lon, lat, data_step, cmap='RdBu_r', shading='auto', vmin=-0.1, vmax=0.1)
+            # Symmetic Vmin/Vmax
+            im = ax.pcolormesh(lon, lat, data_step, cmap='RdBu_r', shading='auto', vmin=-vmax_local, vmax=vmax_local)
             ax.set_xlabel('Lon (°E)')
             if i == 0: ax.set_ylabel('Lat (°N)')
             if extent:
@@ -146,18 +179,19 @@ def analyze_wave():
             ax.set_aspect('equal')
             if i > 0: ax.set_yticklabels([])
         else:
-            im = ax.imshow(data_step, origin='lower', cmap='RdBu_r', vmin=-0.1, vmax=0.1)
+            im = ax.imshow(data_step, origin='lower', cmap='RdBu_r', vmin=-vmax_local, vmax=vmax_local)
             ax.set_xlabel('I')
+            if i > 0: ax.set_yticklabels([])
             
         time_hours = t_step * 60 / 3600
         ax.set_title(f"T = {time_hours:.1f} h")
 
-    fig.suptitle('Kelvin Wave Propagation (SSH)', fontsize=16)
+    fig.suptitle('Kelvin Wave Propagation (SSH)', fontsize=20)
     # Add shared colorbar
     fig.colorbar(im, ax=axes, orientation='horizontal', fraction=0.05, pad=0.02, label='SSH (m)')
     
-    plt.savefig(os.path.join(script_dir, 'fig_ssh_snapshots.png'), dpi=300)
-    print(f"Saved {os.path.join(script_dir, 'fig_ssh_snapshots.png')}")
+    plt.savefig(os.path.join(script_dir, 'fig_expA_ssh_snapshots.png'), dpi=300)
+    print(f"Saved {os.path.join(script_dir, 'fig_expA_ssh_snapshots.png')}")
 
     # --- 3. Variance Map (Geo) ---
     print("Generating Variance Map...")
@@ -191,11 +225,10 @@ def analyze_wave():
     fig.colorbar(im, ax=ax, label='SSH Variance ($m^2$)', shrink=0.8)
     ax.set_title('SSH Variance (Node Identification)')
     
-    plt.savefig(os.path.join(script_dir, 'fig_ssh_variance.png'), dpi=300)
-    print(f"Saved {os.path.join(script_dir, 'fig_ssh_variance.png')}")
+    plt.savefig(os.path.join(script_dir, 'fig_expA_ssh_variance.png'), dpi=300)
+    print(f"Saved {os.path.join(script_dir, 'fig_expA_ssh_variance.png')}")
 
     ds.close()
-    if 'mds' in locals() and mds: mds.close()
 
 if __name__ == "__main__":
     analyze_wave()

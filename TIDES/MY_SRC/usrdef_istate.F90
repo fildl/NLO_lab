@@ -46,7 +46,7 @@ CONTAINS
       zlon0 = 19.5_wp    ! Longitudine centro (aggiornato a 19.5E)
       zlat0 = 40.5_wp    ! Latitudine centro (Canale d'Otranto)
       zsigma = 50000._wp ! Raggio 50 km
-      zmax   = 1.0_wp    ! Altezza 1 metro (Experiment B)
+      zmax   = 0.1_wp    ! Altezza 0.1 metro (Experiment C: Linear Clean)
       !!              - set salinity   field
       !!----------------------------------------------------------------------
       REAL(wp), DIMENSION(jpi,jpj,jpk)     , INTENT(in   ) ::   pdept   ! depth of t-point               [m]
