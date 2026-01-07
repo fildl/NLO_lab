@@ -4,6 +4,7 @@
 \usepackage{hyperref}
 \usepackage{listings}
 \usepackage{xcolor}
+\usepackage{tabularx}
 
 \geometry{margin=2.5cm}
 
@@ -72,7 +73,7 @@ Di seguito le variazioni dei parametri chiave per ogni esperimento condotto.
 
 \begin{table}[h]
 \centering
-\begin{tabular}{|l|c|c|l|l|}
+\begin{tabularx}{\textwidth}{|l|c|c|l|X|}
 \hline
 \textbf{Exp} & \textbf{nn\_GYRE} & \textbf{rn\_Dt (s)} & \textbf{Batimetria} & \textbf{Note} \\ \hline
 
@@ -81,7 +82,7 @@ Di seguito le variazioni dei parametri chiave per ogni esperimento condotto.
 \textbf{C} & 1 ($\Delta x \approx 10$km) & 20 & Pendenza $1000 \to 100$m & Shoaling. $zdep\_min=100m$ per stabilità. \\ \hline
 \textbf{D} & 2 ($\Delta x \approx 5$km) & 20 & Piatta 100m & Media Risoluzione (CFL Sicuro). \\ \hline
 \textbf{E} & 1 ($\Delta x \approx 10$km) & 60 & Piatta 100m & $f=0$. Validazione Fisica (No Coriolis). \\ \hline
-\end{tabular}
+\end{tabularx}
 \caption{Tabella riassuntiva delle configurazioni.}
 \label{tab:configs}
 \end{table}
@@ -90,7 +91,7 @@ Di seguito le variazioni dei parametri chiave per ogni esperimento condotto.
 \begin{itemize}
     \item \textbf{Exp C}: Modificato \texttt{usrdef\_zgr.F90} per introdurre pendenza lineare.
     \item \textbf{Exp D}: Modificato \texttt{namelist\_cfg} per \texttt{nn\_GYRE=2}, \texttt{rn\_Dt=20} e ripristinato \texttt{usrdef\_zgr.F90} a piatto.
-    \item \textbf{Exp E}: Mofidicato \texttt{usrdef\_hgr.F90} per forzare \texttt{pff\_f = pff\_t = 0} (No Coriolis). Ripristinato \texttt{namelist\_cfg} alla Baseline.
+    \item \textbf{Exp E}: Modificato \texttt{usrdef\_hgr.F90} per forzare \texttt{pff\_f = pff\_t = 0} (No Coriolis). Ripristinato \texttt{namelist\_cfg} alla Baseline.
 \end{itemize}
 
 \end{document}
