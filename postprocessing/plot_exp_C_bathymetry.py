@@ -6,7 +6,7 @@ import os
 # Settings
 script_dir = os.path.dirname(os.path.abspath(__file__))
 work_dir = os.path.join(script_dir, 'experiments')
-filename = 'EXP_C_slope.nc'
+filename = 'EXP_C_slope_100.nc'
 filepath = os.path.join(work_dir, filename)
 
 # Mesh mask path candidates
@@ -90,7 +90,7 @@ def analyze_exp_c():
     plt.colorbar(label='SSH (m)')
     plt.xlabel('Distance South-North (km approx)')
     plt.ylabel('Time (hours)')
-    plt.title('Exp C: Hovmöller Diagram (Shoaling Check)')
+    plt.title('Exp C: Hovmöller Diagram (Shoaling Check - 100m Slope)')
     plt.savefig(os.path.join(script_dir, 'fig_ExpC_hovmoller.png'), dpi=300)
     print("Saved fig_ExpC_hovmoller.png")
 
@@ -167,7 +167,7 @@ def analyze_exp_c():
         time_c = np.arange(len(ts_c)) * dt_c / 3600
         time_a = np.arange(len(ts_a)) * dt_a / 3600
         
-        plt.plot(time_c, ts_c, 'r-', label='Exp C (Slope: 30m)', linewidth=2)
+        plt.plot(time_c, ts_c, 'r-', label='Exp C (Slope: 100m)', linewidth=2)
         plt.plot(time_a, ts_a, 'k--', label='Baseline (Flat: 100m)', linewidth=1.5)
         plt.title('Shoaling Effect: SSH at Northern Coast')
         plt.xlabel('Time (hours)')
@@ -184,17 +184,17 @@ def analyze_exp_c():
     if lon is not None:
         fig, ax = plt.subplots(figsize=(8, 10), constrained_layout=True)
         
-        # Reconstruct Depth (Analytical: 1000m South -> 30m North)
+        # Reconstruct Depth (Analytical: 1000m South -> 100m North)
         ny, nx = lat.shape
-        depth_profile = np.linspace(1000, 30, ny)
+        depth_profile = np.linspace(1000, 100, ny)
         depth_grid = np.tile(depth_profile[:, np.newaxis], (1, nx))
         
         # Plot 2D Map
         # User requested "another colormap" (was terrain). 'viridis' is good for depth.
-        cmap = 'viridis_r' # Reversed so deep (1000) is Purple/Dark, shallow (30) is Yellow/Light
+        cmap = 'viridis_r' # Reversed so deep (1000) is Purple/Dark, shallow (100) is Yellow/Light
         im = ax.pcolormesh(lon, lat, depth_grid, cmap=cmap, shading='auto')
         
-        ax.set_title('3D Bathymetry\n(Experiment C)', fontsize=14)
+        ax.set_title('3D Bathymetry\n(Experiment C - 100m Slope)', fontsize=14)
         ax.set_xlabel('Longitude (°E)')
         ax.set_ylabel('Latitude (°N)')
         ax.set_aspect('equal')
@@ -265,7 +265,9 @@ def analyze_exp_c():
         ax.set_ylabel('Time (hours)')
         
         # Visual guide roughly tracking the wave
-        ax.plot([0, hov_A.shape[1]*10], [0, 18], 'k--', alpha=0.3, label='Linear Ref')
+        # c = sqrt(9.8 * 100) = 31.3 m/s = 112 km/h. Dist ~ 850km -> T ~ 7.5h
+        ax.plot([0, hov_A.shape[1]*10], [0, hov_A.shape[1]*10000 / 31.3 / 3600], 'k--', alpha=0.5, label='Theory c=31m/s')
+        ax.legend()
     
         # 2. Exp C
         ax = axes[1]
@@ -273,9 +275,24 @@ def analyze_exp_c():
         # Using symmetric vmin/vmax
         im2 = ax.imshow(hov_C, aspect='auto', origin='lower', cmap='RdBu_r', vmin=-vmax_c, vmax=vmax_c,
                        extent=[0, hov_C.shape[1]*10, 0, hov_C.shape[0]*dt_c/3600])
-        ax.set_title('Exp C: Sloping Bottom (1000m -> 30m)\nDecelerating -> Curved Line')
+        ax.set_title('Exp C: Sloping Bottom (1000m -> 100m)\nDecelerating -> Curved Line')
         ax.set_xlabel('Distance South-North (km approx)')
         ax.set_yticklabels([])
+        
+        # Theoretical Curve for Exp C (Slope)
+        # H(y) = 1000 - (1000-100) * y / L
+        # c(y) = sqrt(g * H(y))
+        # t(y) = Integral dy / c(y)
+        L = hov_C.shape[1] * 10000.0 # Length in meters
+        y_pts = np.linspace(0, L, 100)
+        h_pts = 1000.0 - (1000.0 - 100.0) * y_pts / L
+        c_pts = np.sqrt(9.81 * h_pts)
+        t_pts = np.cumsum(1.0 / c_pts) * (y_pts[1]-y_pts[0]) # Simple integration
+        t_hrs = t_pts / 3600.0
+        
+        # Plot Theory Curve
+        ax.plot(y_pts / 1000.0, t_hrs, 'k--', linewidth=2, label='Theory (variable depth)')
+        ax.legend()
         
         fig.colorbar(im, ax=axes, orientation='horizontal', fraction=0.05, pad=0.02, label='SSH (m)')
         

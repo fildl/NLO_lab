@@ -119,7 +119,9 @@ Il sistema si comporta in modo \textbf{lineare} per perturbazioni fino a 1.0 m s
 \subsection{Configurazione}
 \begin{itemize}
     \item \textbf{Batimetria}: Pendenza lineare $H(y)$ lungo l'asse Nord-Sud.
-    $$ H(y) = 1000 \text{m (Sud)} \to 30 \text{m (Nord)} $$
+    $$ H(y) = 1000 \text{m (Sud)} \to 100 \text{m (Nord)} $$
+    \textit{Nota: La profondità minima è stata portata a 100m (inizialmente 30m) per evitare problemi di risoluzione verticale. Con 31 livelli ($jpk=31$), ogni livello è alto circa 33m; una profondità di 30m avrebbe comportato un singolo livello attivo ("step" ripido), causando riflessioni spurie e perdita di energia.}
+    
     La visualizzazione 3D del dominio è in Figura \ref{fig:bathyC}.
     \item \textbf{Perturbazione}: $A_0 = 0.1$ m (Regime Lineare) centrata a Sud-Est (Canale d'Otranto).
     \item \textbf{Parametri Numerici}: A causa della maggiore profondità ($H=1000$m $\Rightarrow c \approx 100$ m/s), il timestep è stato ridotto a $\Delta t = 20$ s (invece di 60 s) per soddisfare la condizione CFL. Durata totale mantenuta a 24h ($N_{steps} = 4320$).
@@ -138,8 +140,14 @@ Il sistema si comporta in modo \textbf{lineare} per perturbazioni fino a 1.0 m s
 La teoria prevede che l'ampiezza dell'onda aumenti quando la profondità diminuisce (Legge di Green: $A \propto H^{-1/4}$).
 Confrontando la serie temporale dell'SSH al Nord (Venezia) tra l'esperimento C (30m) e la Baseline (100m) in Figura \ref{fig:shoaling}, osserviamo chiaramente:
 \begin{enumerate}
-    \item \textbf{Amplificazione}: Il picco dell'onda è significativamente più alto nel caso a profondità variabile.
-    \item \textbf{Rallentamento}: L'onda arriva più tardi rispetto al caso a 100m, poiché la velocità di fase $c=\sqrt{gh}$ diminuisce verso Nord.
+    \item \textbf{Amplificazione (Attesa vs Osservata)}:
+    Teoricamente (Legge di Green $A \propto H^{-1/4}$), l'onda dovrebbe amplificarsi di un fattore $\approx (1000/100)^{0.25} \approx 1.77$.
+    Tuttavia, osserviamo un'ampiezza minore rispetto alla Baseline. Le cause probabili sono:
+    \begin{itemize}
+        \item \textbf{Dispersione Numerica}: L'onda viaggia molto velocemente ($c \approx 100$ m/s) su una griglia spaziale invariata (~10 km). Questo riduce l'accuratezza nel preservare il picco.
+        \item \textbf{Dinamica a Grande Scala}: A 1000m di profondità, il Raggio di Rossby ($R \approx 1000$ km) è molto maggiore della larghezza del bacino. L'onda non è più una Kelvin wave confinata, ma uno "sloshing" che coinvolge tutto il bacino, disperdendo energia su un fronte più ampio rispetto al caso a 100m.
+    \end{itemize}
+    \item \textbf{Velocità di Fase (Corretta)}: L'onda arriva al Nord dopo circa 4 ore, contro le 9 ore del caso a 100m. Questo è fisicamente corretto e coerente con la maggiore velocità media in acqua profonda.
 \end{enumerate}
 
 \begin{figure}[H]
@@ -149,13 +157,16 @@ Confrontando la serie temporale dell'SSH al Nord (Venezia) tra l'esperimento C (
     \label{fig:shoaling}
 \end{figure}
 
-\subsubsection{2. Diagramma di Hovmöller}
-Il diagramma spazio-tempo (Figura \ref{fig:hovmollerC}) mostra la curvatura del fronte d'onda. La pendenza della traccia indica la velocità (distanza/tempo). La pendenza diminuisce andando verso Nord (y crescente), confermando il rallentamento progressivo dell'onda.
+\subsubsection{2. Diagramma di Hovmöller e Velocità Teorica}
+Il diagramma spazio-tempo (Figura \ref{fig:hovmollerC}) conferma la natura fisica della propagazione.
+Abbiamo sovrapposto la curva teorica del tempo di arrivo $t(y)$, calcolata integrando la velocità di fase locale (dipendente dalla profondità $H(y)$):
+$$ t(y) = \int_0^y \frac{dy'}{\sqrt{g H(y')}} $$
+La pendenza della traccia numerica segue perfettamente la curva teorica (linea tratteggiata), confermando che l'onda viaggia alla velocità corretta data dalla batimetria. La curvatura indica la decelerazione progressiva mentre l'onda risale verso acque più basse.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\textwidth]{fig_ExpC_hovmoller.png}
-    \caption{Diagramma di Hovmöller per Esperimento C. La curvatura indica la decelerazione verso Nord.}
+    \includegraphics[width=1.0\textwidth]{fig_ExpC_hovmoller_comparison.png}
+    \caption{Confronto Diagrammi di Hovmöller. A sinistra: Exp A (velocità costante). A destra: Exp C con curva teorica sovrapposta (linea tratteggiata).}
     \label{fig:hovmollerC}
 \end{figure}
 
