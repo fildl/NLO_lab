@@ -1,41 +1,43 @@
-# macOS
+# OS generated files
 .DS_Store
-.AppleDouble
-.LSOverride
+.DS_Store?
 ._*
 .Spotlight-V100
 .Trashes
-.fseventsd
-.VolumeIcon.icns
-.AppleDB
-.AppleDesktop
-Network Trash Folder
-Temporary Items
-.apdisk
-
-# NEMO/Fortran Build artifacts
-TIDES/BLD/
-TIDES/WORK/
-*.mod
-*.o
-*.fcm
-
-# Output and Log files
-*.out
-*.err
-*.log
-
-# NetCDF Data files (usually large)
-*.nc
+ehthumbs.db
+Thumbs.db
 
 # Python
 __pycache__/
-*.py[cod]
-*$py.class
-.ipynb_checkpoints/
+*.pyc
 
-# Images/Plots (generated)
-*.png
-*.jpg
-*.jpeg
-*.pdf
+# Simulation Data (Large)
+*.nc
+# Keep mesh mask if intended to be tracked? Usually not if large/generated
+# mesh_mask*.nc 
+
+# generated Figures
+postprocessing/*.png
+# Or ignore all pngs?
+# *.png
+
+# LaTeX Output
+*.aux
+*.log
+*.out
+*.toc
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+postprocessing/docs/latex_aux/
+
+# NEMO Build Artifacts
+TIDES/BLD/
+TIDES/WORK/
+usrdef_exp/
+
+
+# Environments
+.env
+.venv
+venv/

@@ -61,20 +61,18 @@ def analyze_exp_c():
         lat = ds.variables['nav_lat'][:]
         extent = [lon.min(), lon.max(), lat.min(), lat.max()]
     
+
     # --- 1. Hovmöller Diagram (East Coast) ---
     print("Generating Hovmöller Diagram...")
     ny, nx = ssh.shape[1], ssh.shape[2]
     
-    # Dynamic East Coast Path
-    ssh_var_2d = np.var(ssh, axis=0)
-    east_coast_idx = []
-    for j in range(ny):
-        start_search = nx // 2
-        if start_search < nx:
-            local_max_idx = np.argmax(ssh_var_2d[j, start_search:])
-            east_coast_idx.append(start_search + local_max_idx)
-        else:
-            east_coast_idx.append(nx-2)
+    # Time settings
+    dt_c = 20.0  # seconds (Exp C)
+    dt_a = 60.0  # seconds (Exp A / Baseline)
+    
+    # Fixed East Coast Path
+    # Use fixed index near eastern boundary (nx-2) to avoid artifacts
+    east_coast_idx = [nx - 2] * ny
 
     hovmoller = np.zeros((ssh.shape[0], ny))
     for t in range(ssh.shape[0]):
@@ -88,7 +86,7 @@ def analyze_exp_c():
     
     plt.imshow(hovmoller, aspect='auto', origin='lower', cmap='RdBu_r', 
                vmin=-h_vmax, vmax=h_vmax,
-               extent=[0, ny*10, 0, ssh.shape[0]*60/3600]) # Approx 10km grid
+               extent=[0, ny*10, 0, ssh.shape[0]*dt_c/3600]) # Approx 10km grid
     plt.colorbar(label='SSH (m)')
     plt.xlabel('Distance South-North (km approx)')
     plt.ylabel('Time (hours)')
@@ -97,12 +95,18 @@ def analyze_exp_c():
     print("Saved fig_ExpC_hovmoller.png")
 
     # --- 2. Snapshots ---
-    # --- 2. Snapshots ---
     print("Generating Snapshots...")
     # Plot 5 snapshots from 2h to 16h
-    steps = np.linspace(120, 960, 5, dtype=int)
+    # Need to calculate steps based on dt=20
+    # 2h = 7200s = 360 steps
+    # 16h = 57600s = 2880 steps
+    steps = np.linspace(360, 2880, 5, dtype=int)
     
     # Robust Vmax from selected frames
+    # Ensure steps don't exceed file length
+    steps = [s for s in steps if s < ssh.shape[0]]
+    if not steps: steps = [0]
+    
     selected_ssh = ssh[steps, :, :]
     vmax_local = np.percentile(np.abs(selected_ssh), 99.9)
     print(f"Exp C Vmax: {vmax_local}")
@@ -112,8 +116,10 @@ def analyze_exp_c():
     
     fig, axes = plt.subplots(1, 5, figsize=(15, 10), constrained_layout=True)
     
+    # Handle single plot case if only 1 step
+    if len(steps) == 1: axes = [axes]
+
     for i, t_step in enumerate(steps):
-        if t_step >= ssh.shape[0]: continue
         ax = axes[i]
         data_step = ssh[t_step, :, :]
         # Apply mask
@@ -129,11 +135,12 @@ def analyze_exp_c():
             im = ax.imshow(data_step, origin='lower', cmap='RdBu_r', vmin=-vmax_local, vmax=vmax_local)
             ax.set_xlabel('I')
             
-        ax.set_title(f"T = {t_step*60/3600:.1f} h")
+        ax.set_title(f"T = {t_step*dt_c/3600:.1f} h")
         if i > 0: ax.set_yticklabels([])
 
     fig.suptitle('Exp C: Kelvin Wave Propagation', fontsize=20)
-    fig.colorbar(im, ax=axes, orientation='horizontal', fraction=0.05, pad=0.02, label='SSH (m)')
+    if 'im' in locals():
+        fig.colorbar(im, ax=axes, orientation='horizontal', fraction=0.05, pad=0.02, label='SSH (m)')
     plt.savefig(os.path.join(script_dir, 'fig_ExpC_snapshots.png'), dpi=300)
     print("Saved fig_ExpC_snapshots.png")
 
@@ -157,9 +164,11 @@ def analyze_exp_c():
         ts_a = ssh_base[:, j_north, i_north]
         
         plt.figure(figsize=(10, 6))
-        time_ax = np.arange(len(ts_c)) * 60 / 3600
-        plt.plot(time_ax, ts_c, 'r-', label='Exp C (Slope: 30m)', linewidth=2)
-        plt.plot(time_ax, ts_a, 'k--', label='Baseline (Flat: 100m)', linewidth=1.5)
+        time_c = np.arange(len(ts_c)) * dt_c / 3600
+        time_a = np.arange(len(ts_a)) * dt_a / 3600
+        
+        plt.plot(time_c, ts_c, 'r-', label='Exp C (Slope: 30m)', linewidth=2)
+        plt.plot(time_a, ts_a, 'k--', label='Baseline (Flat: 100m)', linewidth=1.5)
         plt.title('Shoaling Effect: SSH at Northern Coast')
         plt.xlabel('Time (hours)')
         plt.ylabel('SSH (m)')
@@ -198,8 +207,22 @@ def analyze_exp_c():
         
         # Annotation removed as per user request
         
+        # --- Overlay Extraction Path ---
+        # Convert grid indices to Lon/Lat coordinates
+        path_lons = []
+        path_lats = []
+        for j in range(ny):
+            i_idx = east_coast_idx[j]
+            # Ensure index within bounds
+            if i_idx >= nx: i_idx = nx - 1
+            path_lons.append(lon[j, int(i_idx)])
+            path_lats.append(lat[j, int(i_idx)])
+            
+        ax.plot(path_lons, path_lats, 'r-', linewidth=2, label='Hovmöller Path')
+        ax.legend(loc='upper right')
+        
         plt.savefig(os.path.join(script_dir, 'fig_ExpC_bathymetry_3D.png'), dpi=300) # Keep filename as requested by user flow implies replacing
-        print("Saved fig_ExpC_bathymetry_3D.png (2D Map version)")
+        print("Saved fig_ExpC_bathymetry_3D.png (2D Map version with path)")
     else:
         print("Cannot plot Bathymetry without Longitude/Latitude data.")
 
@@ -215,14 +238,9 @@ def analyze_exp_c():
         # Helper to extract hovmoller
         def get_hov(data_ssh):
             ny, nx = data_ssh.shape[1], data_ssh.shape[2]
-            var_2d = np.var(data_ssh, axis=0)
-            ec_idx = []
-            for j in range(ny):
-                start = nx // 2
-                if start < nx:
-                    ec_idx.append(start + np.argmax(var_2d[j, start:]))
-                else:
-                    ec_idx.append(nx-2)
+            # Fixed index path
+            ec_idx = [nx - 2] * ny
+            
             hov = np.zeros((data_ssh.shape[0], ny))
             for t in range(data_ssh.shape[0]):
                 for j in range(ny):
@@ -241,7 +259,7 @@ def analyze_exp_c():
         # 1. Exp A
         ax = axes[0]
         im = ax.imshow(hov_A, aspect='auto', origin='lower', cmap='RdBu_r', vmin=-vmax, vmax=vmax,
-                       extent=[0, hov_A.shape[1]*10, 0, hov_A.shape[0]*60/3600])
+                       extent=[0, hov_A.shape[1]*10, 0, hov_A.shape[0]*dt_a/3600])
         ax.set_title('Exp A: Flat Bottom (100m)\nConstant Speed -> Straight Line')
         ax.set_xlabel('Distance South-North (km approx)')
         ax.set_ylabel('Time (hours)')
@@ -254,7 +272,7 @@ def analyze_exp_c():
         vmax_c = np.percentile(np.abs(hov_C), 99)
         # Using symmetric vmin/vmax
         im2 = ax.imshow(hov_C, aspect='auto', origin='lower', cmap='RdBu_r', vmin=-vmax_c, vmax=vmax_c,
-                       extent=[0, hov_C.shape[1]*10, 0, hov_C.shape[0]*60/3600])
+                       extent=[0, hov_C.shape[1]*10, 0, hov_C.shape[0]*dt_c/3600])
         ax.set_title('Exp C: Sloping Bottom (1000m -> 30m)\nDecelerating -> Curved Line')
         ax.set_xlabel('Distance South-North (km approx)')
         ax.set_yticklabels([])

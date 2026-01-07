@@ -83,7 +83,7 @@ CONTAINS
       !
       !zlam1 = -85._wp                           ! position of gridpoint (i,j) = (1,jpjglo)
       !zphi1 =  29._wp
-       zlam1 = 12._wp
+       zlam1 = 16._wp
        zphi1 = 40._wp
       !
       !ze1 = 106000._wp / REAL( nn_GYRE , wp )   ! gridspacing in meters

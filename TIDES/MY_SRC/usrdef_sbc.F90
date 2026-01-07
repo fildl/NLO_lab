@@ -78,17 +78,21 @@ CONTAINS
       qsr(:,:) = 0.0_wp
       qns(:,:) = 0.0_wp
       emp(:,:) = 0.0_wp
+      utau(:,:) = 0.0_wp
+      vtau(:,:) = 0.0_wp
+      taum(:,:) = 0.0_wp
+      wndm(:,:) = 0.0_wp
 
-      zsumemp = GLOB_SUM( 'usrdef_sbc', emp  (:,:)   ) 
-      zsurf   = GLOB_SUM( 'usrdef_sbc', tmask(:,:,1) ) 
-      zsumemp = zsumemp / zsurf         ! Default GYRE configuration
+!      zsumemp = GLOB_SUM( 'usrdef_sbc', emp  (:,:)   ) 
+!      zsurf   = GLOB_SUM( 'usrdef_sbc', tmask(:,:,1) ) 
+!      zsumemp = zsumemp / zsurf         ! Default GYRE configuration
 
       ! freshwater (mass flux) and update of qns with heat content of emp
-      DO_2D( nn_hls, nn_hls, nn_hls, nn_hls )   ! emp used in sshwzv over the whole domain
-         emp (ji,jj) = emp(ji,jj) - zsumemp * tmask(ji,jj,1)          ! freshwater flux (=0 in domain average)
-         sfx (ji,jj) = 0.0_wp                                         ! no salt flux
-         qns (ji,jj) = qns(ji,jj) - emp(ji,jj) * sst_m(ji,jj) * rcp   ! evap and precip are at SST
-      END_2D
+!      DO_2D( nn_hls, nn_hls, nn_hls, nn_hls )   ! emp used in sshwzv over the whole domain
+!         emp (ji,jj) = emp(ji,jj) - zsumemp * tmask(ji,jj,1)          ! freshwater flux (=0 in domain average)
+!         sfx (ji,jj) = 0.0_wp                                         ! no salt flux
+!!         qns (ji,jj) = qns(ji,jj) - emp(ji,jj) * sst_m(ji,jj) * rcp   ! evap and precip are at SST
+!      END_2D
 
 
       ! --------------------------------------------------------------
@@ -103,17 +107,17 @@ CONTAINS
       
       !zcoef = 1. / ( zrhoa * zcdrag ) 
       !utau(:,:) = -1.0_wp * ( zrhoa * zcdrag ) * 2.0_wp * (wind_a*wind_a)
-       utau(:,:) = 0.0_wp
-       vtau(:,:) = 0.0_wp
-      DO_2D( 0, 0, 0, 0 )
+    !   utau(:,:) = 0.0_wp
+    !   vtau(:,:) = 0.0_wp
+!      DO_2D( 0, 0, 0, 0 )
          !ztx = utau(ji-1,jj  ) + utau(ji,jj) 
          !zty = vtau(ji  ,jj-1) + vtau(ji,jj) 
          !zmod = 0.5 * SQRT( ztx * ztx + zty * zty )
          !taum(ji,jj) = zmod
          !wndm(ji,jj) = SQRT( zmod * zcoef )
-          taum(ji,jj) = 0.0_wp
-          wndm(ji,jj) = 0.0_wp
-      END_2D
+!          taum(ji,jj) = 0.0_wp
+!          wndm(ji,jj) = 0.0_wp
+!      END_2D
 
       ! --------------------------------------------------------------
       ! Apply a Gaussian pertubation to the wind stress

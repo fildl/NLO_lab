@@ -69,28 +69,35 @@ def analyze_wave():
     print("Generating Hovmöller Diagram...")
     ny, nx = ssh.shape[1], ssh.shape[2]
     
-    # Robust East Coast Path: Track max variance to find the wave
-    # This avoids hitting land or zero-boundary cells
-    ssh_var_2d = np.var(ssh, axis=0)
-    east_coast_idx = []
-    
-    for j in range(ny):
-        # Search in the eastern half of the domain for the maximum signal
-        # This assumes the Kelvin wave is on the East coast
-        start_search = nx // 2
-        if start_search < nx:
-            # Find index of max variance in this row
-            local_max_idx = np.argmax(ssh_var_2d[j, start_search:])
-            actual_i = start_search + local_max_idx
-            east_coast_idx.append(actual_i)
-        else:
-            east_coast_idx.append(nx-2) # Fallback
+    # Robust East Coast Path: Fixed index due to idealized domain
+    # Use fixed index near eastern boundary (nx-2) to avoid artifacts
+    east_coast_idx = [nx - 2] * ny
 
     hovmoller = np.zeros((ssh.shape[0], ny))
     for t in range(ssh.shape[0]):
         for j in range(ny):
             idx = east_coast_idx[j]
             hovmoller[t, j] = ssh[t, j, int(idx)]
+            
+    # Plot Domain & Path (Requested "Similar to Exp C")
+    if 'lon' in locals() and lon is not None:
+        fig_path, ax_path = plt.subplots(figsize=(6, 8))
+        # Simple domain mask
+        if tmask is not None:
+            ax_path.pcolormesh(lon, lat, tmask, cmap='Greys', alpha=0.3)
+        
+        # Path
+        path_lons = [lon[j, nx-2] for j in range(ny)]
+        path_lats = [lat[j, nx-2] for j in range(ny)]
+        
+        ax_path.plot(path_lons, path_lats, 'r-', linewidth=2, label='Hovmöller Path')
+        ax_path.legend(loc='upper right')
+        ax_path.set_title('Exp A: Extraction Path')
+        ax_path.set_xlabel('Longitude (°E)')
+        ax_path.set_ylabel('Latitude (°N)')
+        ax_path.set_aspect('equal')
+        plt.savefig(os.path.join(script_dir, 'fig_expA_path.png'), dpi=300)
+        print("Saved fig_expA_path.png")
 
     plt.figure(figsize=(10, 8))
     # Use robust vmin/vmax for visibility

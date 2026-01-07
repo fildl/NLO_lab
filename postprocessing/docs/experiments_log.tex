@@ -23,11 +23,25 @@ L'obiettivo è analizzare la risposta del modello variando parametri come l'ampi
 
 \section{Experiment A: Baseline (Riferimento)}
 \textbf{Obiettivo:} Stabilire una simulazione stabile.
+\subsection{Configurazione}
 \begin{itemize}
     \item \textbf{Configurazione}: $A_0 = 1.0$m, Batimetria piatta 100m.
+    \item \textbf{Estrazione}: Il percorso di estrazione per il diagramma di Hovmöller è mostrato in Figura \ref{fig:pathA}.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{fig_expA_path.png}
+    \caption{Percorso di estrazione (linea rossa) per il diagramma di Hovmöller (Exp A).}
+    \label{fig:pathA}
+\end{figure}
+
+\subsection{Risultati}
+\begin{itemize}
     \item \textbf{Risultato}: Simulazione stabile con timestep 60s.
 \end{itemize}
 
+\newpage
 \section{Experiment B: Amplitude Sensitivity (Linearity Check)}
 \textbf{Obiettivo:} Verificare la linearità della risposta del modello (SSH Output vs Input) e la dipendenza della velocità di fase dall'ampiezza.
 
@@ -47,7 +61,7 @@ La Figura \ref{fig:snapshots} mostra l'evoluzione temporale dell'SSH.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.95\textwidth]{fig_ssh_snapshots.png}
+    \includegraphics[width=0.95\textwidth]{fig_expA_ssh_snapshots.png}
     \caption{Snapshots dell'elevazione superficiale (SSH) a intervalli di ~4 ore. L'onda viaggia in senso antiorario.}
     \label{fig:snapshots}
 \end{figure}
@@ -60,7 +74,7 @@ Non si osservano sfasamenti temporali significativi, suggerendo che la velocità
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\textwidth]{fig_compare_linearity.png}
+    \includegraphics[width=0.8\textwidth]{fig_expB_compare_linearity.png}
     \caption{Confronto delle serie temporali normalizzate a Venezia. La sovrapposizione indica una risposta lineare.}
     \label{fig:linearity}
 \end{figure}
@@ -69,7 +83,7 @@ Per quantificare eventuali effetti non lineari, abbiamo calcolato la mappa della
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.6\textwidth]{fig_compare_nonlinear_map.png}
+    \includegraphics[width=0.6\textwidth]{fig_expB_compare_nonlinear_map.png}
     \caption{Mappa della non-linearità (Differenza tra run normalizzati).}
     \label{fig:nonlinear}
 \end{figure}
@@ -80,7 +94,7 @@ Il minimo di varianza (zona blu scuro) indica la posizione del \textbf{Punto Anf
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.6\textwidth]{fig_ssh_variance.png}
+    \includegraphics[width=0.6\textwidth]{fig_expA_ssh_variance.png}
     \caption{Mappa della varianza SSH. I minimi indicano potenziali punti anfidromici.}
     \label{fig:variance}
 \end{figure}
@@ -90,14 +104,15 @@ Il diagramma di Hovmöller lungo la costa Est (Figura \ref{fig:hovmoller}) confe
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\textwidth]{fig_hovmoller_east.png}
+    \includegraphics[width=0.8\textwidth]{fig_expA_hovmoller_east.png}
     \caption{Diagramma di Hovmöller lungo la costa orientale.}
     \label{fig:hovmoller}
 \end{figure}
 
-\section{Conclusioni Esperimento B}
+\subsection{Conclusioni}
 Il sistema si comporta in modo \textbf{lineare} per perturbazioni fino a 1.0 m su fondale di 100 m. La velocità di propagazione è costante e indipendente dall'ampiezza in questo range.
 
+\newpage
 \section{Experiment C: Bathymetry Sensitivity (Pendenza Adriatica)}
 \textbf{Obiettivo:} Analizzare la propagazione dell'onda di Kelvin su un fondale inclinato, simile a quello reale dell'Adriatico (da 1000m a Sud a 30m a Nord).
 
@@ -105,8 +120,17 @@ Il sistema si comporta in modo \textbf{lineare} per perturbazioni fino a 1.0 m s
 \begin{itemize}
     \item \textbf{Batimetria}: Pendenza lineare $H(y)$ lungo l'asse Nord-Sud.
     $$ H(y) = 1000 \text{m (Sud)} \to 30 \text{m (Nord)} $$
+    La visualizzazione 3D del dominio è in Figura \ref{fig:bathyC}.
     \item \textbf{Perturbazione}: $A_0 = 0.1$ m (Regime Lineare) centrata a Sud-Est (Canale d'Otranto).
+    \item \textbf{Parametri Numerici}: A causa della maggiore profondità ($H=1000$m $\Rightarrow c \approx 100$ m/s), il timestep è stato ridotto a $\Delta t = 20$ s (invece di 60 s) per soddisfare la condizione CFL. Durata totale mantenuta a 24h ($N_{steps} = 4320$).
 \end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{fig_ExpC_bathymetry_3D.png}
+    \caption{Batimetria 3D Esperimento C: Pendenza lineare lungo Y.}
+    \label{fig:bathyC}
+\end{figure}
 
 \subsection{Analisi dei Risultati}
 
