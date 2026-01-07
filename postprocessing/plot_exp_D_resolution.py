@@ -76,7 +76,7 @@ def analyze_resolution():
         
     plt.plot(t_D, ssh_D, 'r-', linewidth=2, alpha=0.8, label=f'Exp D (dx~5km, dt=20s)')
     
-    plt.title('Effect of Resolution on Kelvin Wave (Venice SSH)')
+    plt.title('Effect of Resolution on Kelvin Wave (Northern End SSH)')
     plt.xlabel('Time (hours)')
     plt.ylabel('SSH (m)')
     plt.grid(True, alpha=0.3)
