@@ -67,7 +67,7 @@ La mappa della varianza (Figura \ref{fig:varianceA}) mostra dove l'oscillazione 
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.5\textwidth]{fig_expA_ssh_variance.png}
+    \includegraphics[width=0.25\textwidth]{fig_expA_ssh_variance.png}
     \caption{Mappa della Varianza SSH (Exp A). Il blu scuro al centro indica il nodo dell'onda stazionaria.}
     \label{fig:varianceA}
 \end{figure}
@@ -78,18 +78,9 @@ Il percorso di estrazione per il diagramma di Hovmöller scorre lungo la costa o
 Il diagramma lungo la costa Est (Figura \ref{fig:hovmollerA}) mostra una propagazione lineare senza distorsioni.
 \begin{figure}[H]
     \centering
-    \begin{minipage}{0.45\textwidth}
-        \centering
-        \includegraphics[height=5.5cm]{fig_expA_path.png}
-        \caption{Percorso di estrazione (linea rossa) per il diagramma di Hovmöller (Exp A).}
-        \label{fig:pathA}
-    \end{minipage}\hfill
-    \begin{minipage}{0.45\textwidth}
-        \centering
-        \includegraphics[height=5.5cm]{fig_expA_hovmoller_east.png}
-        \caption{Diagramma di Hovmöller (Exp A).}
-        \label{fig:hovmollerA}
-    \end{minipage}
+    \includegraphics[width=0.5\textwidth]{fig_expA_hovmoller.png}
+    \caption{Sinistra:Percorso di estrazione (linea rossa) per il diagramma di Hovmöller (Exp A). Destra: Diagramma di Hovmöller (Exp A).}
+    \label{fig:varianceA}
 \end{figure}
 
 \newpage
@@ -165,8 +156,8 @@ Il sistema si comporta in modo \textbf{lineare} per perturbazioni fino a 1.0 m s
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.5\textwidth]{fig_ExpC_bathymetry_3D.png}
-    \caption{Batimetria 3D Esperimento C: Pendenza lineare lungo Y.}
+    \includegraphics[width=0.25\textwidth]{fig_ExpC_bathymetry_3D.png}
+    \caption{Batimetria Esperimento C: Pendenza lineare lungo Y.}
     \label{fig:bathyC}
 \end{figure}
 
@@ -189,7 +180,7 @@ Confrontando la serie temporale dell'SSH all'Estremità Nord tra l'esperimento C
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\textwidth]{fig_ExpC_shoaling_comparison.png}
+    \includegraphics[width=1.0\textwidth]{fig_ExpC_shoaling_comparison.png}
     \caption{Confronto SSH a Nord: Exp C (Rosso, batimetria lineare) vs Baseline (Nero, batimetria piatta). Evidente lo shoaling e lo sfasamento.}
     \label{fig:shoaling}
 \end{figure}
@@ -206,20 +197,24 @@ La pendenza della traccia numerica segue la curva teorica (linea tratteggiata), 
     \label{fig:hovmollerC}
 \end{figure}
 
-\subsubsection{3. Evoluzione Spaziale}
-Gli snapshots in Figura \ref{fig:snapshotsC} mostrano l'onda che si "accumula" e cresce mentre risale il bacino.
+\subsubsection{3. Evoluzione Spaziale (Confronto A vs C)}
+Gli snapshots in Figura \ref{fig:snapshotsC} (Exp C), confrontati con quelli della Baseline (Exp A), evidenziano differenze dinamiche fondamentali:
+\begin{itemize}
+    \item \textbf{Velocità}: In Exp C l'onda viaggia molto più velocemente. A $T=5.5$h il fronte ha già percorso gran parte del bacino, mentre in Exp A è ancora nella prima metà.
+    \item \textbf{Confinamento Costiero}: In Exp A (100m) l'onda è ben confinata alla costa (Raggio di Rossby $R \approx 300$ km). In Exp C, nelle zone profonde (1000m), $R$ aumenta drasticamente ($R \approx 1000$ km), superando la larghezza del bacino. Di conseguenza, l'onda perde il carattere di Kelvin "intrappolata" e assume un comportamento più dispersivo o di oscillazione dell'intero bacino ("sloshing").
+\end{itemize}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.95\textwidth]{fig_ExpC_snapshots.png}
-    \caption{Snapshots Esperimento C. Notare l'aumento di intensità del colore (ampiezza) verso Nord.}
+    \caption{Snapshots Esperimento C.}
     \label{fig:snapshotsC}
 \end{figure}
 
 \newpage
 \section{Experiment D: Resolution Sensitivity}
 \textbf{Obiettivo:} Verificare l'impatto della risoluzione spaziale sulla dissipazione numerica.
-Aumentando la risoluzione, ci aspettiamo che l'onda mantenga meglio la sua forma e ampiezza nel tempo, riducendo la viscosità numerica implicita.
+Aumentando la risoluzione, mi aspetto che l'onda mantenga meglio la sua forma e ampiezza nel tempo, riducendo la diffusività numerica.
 
 \subsection{Configurazione}
 \begin{itemize}
@@ -249,7 +244,7 @@ Il diagramma spazio-tempo per il caso ad alta risoluzione (Figura \ref{fig:hov_D
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.8\textwidth]{fig_ExpD_hovmoller.png}
-    \caption{Diagramma di Hovmöller per Exp D (5km). Notare la nitidezza del fronte d'onda.}
+    \caption{Diagramma di Hovmöller per Exp D (5km).}
     \label{fig:hov_D}
 \end{figure}
 
