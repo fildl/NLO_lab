@@ -12,7 +12,7 @@ file_A = 'EXP_AMP_0.1m.nc'  # Make sure this matches your local file
 path_A = os.path.join(work_dir, file_A)
 
 # Exp D (High Res)
-file_D = 'EXP_D_highres.nc' # Expected filename
+file_D = 'EXP_D.nc' # Expected filename
 path_D = os.path.join(work_dir, file_D)
 
 def get_ssh_venice(filepath, label):

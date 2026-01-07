@@ -41,6 +41,35 @@ L'obiettivo è analizzare la risposta del modello variando parametri come l'ampi
     \item \textbf{Risultato}: Simulazione stabile con timestep 60s.
 \end{itemize}
 
+\subsubsection{1. Evoluzione Spaziale}
+La propagazione dell'onda è mostrata in Figura \ref{fig:snapshotsA}. L'onda viaggia in senso antiorario lungo i bordi del bacino (Kelvin Wave).
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{fig_expA_ssh_snapshots.png}
+    \caption{Snapshots SSH per Experiment A (Baseline). Notare il movimento antiorario.}
+    \label{fig:snapshotsA}
+\end{figure}
+
+\subsubsection{2. Analisi della Varianza (Punto Anfidromico)}
+La mappa della varianza (Figura \ref{fig:varianceA}) mostra dove l'oscillazione è massima (antinodi, ai bordi) e dove è minima. Il minimo centrale indica il potenziale punto anfidromico.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{fig_expA_ssh_variance.png}
+    \caption{Mappa della Varianza SSH (Exp A). Il blu scuro al centro indica il nodo dell'onda stazionaria.}
+    \label{fig:varianceA}
+\end{figure}
+
+\subsubsection{3. Diagramma di Hovmöller}
+Il diagramma lungo la costa Est (Figura \ref{fig:hovmollerA}) mostra una propagazione lineare senza distorsioni.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{fig_expA_hovmoller_east.png}
+    \caption{Diagramma di Hovmöller (Exp A).}
+    \label{fig:hovmollerA}
+\end{figure}
+
 \newpage
 \section{Experiment B: Amplitude Sensitivity (Linearity Check)}
 \textbf{Obiettivo:} Verificare la linearità della risposta del modello (SSH Output vs Input) e la dipendenza della velocità di fase dall'ampiezza.
@@ -55,18 +84,7 @@ Sono state eseguite tre run con perturbazione Gaussiana ($R=20$ km) centrata a 1
 
 \subsection{Analisi dei Risultati}
 
-\subsubsection{1. Propagazione Spaziale}
-L'onda generata si propaga verso Nord lungo la costa orientale, come previsto per un'onda di Kelvin nell'emisfero Nord. Viene riflessa alla testata del bacino (Nord) e scende lungo la costa Ovest.
-La Figura \ref{fig:snapshots} mostra l'evoluzione temporale dell'SSH.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.95\textwidth]{fig_expA_ssh_snapshots.png}
-    \caption{Snapshots dell'elevazione superficiale (SSH) a intervalli di ~4 ore. L'onda viaggia in senso antiorario.}
-    \label{fig:snapshots}
-\end{figure}
-
-\subsubsection{2. Verifica della Linearità}
+\subsubsection{1. Verifica della Linearità}
 Abbiamo confrontato le serie temporali dell'SSH registrate a Venezia (Nord del bacino), normalizzate per l'ampiezza iniziale $A_0$.
 Come mostrato in Figura \ref{fig:linearity}, le curve normalizzate sono \textbf{perfettamente sovrapposte}. Questo indica che il modello risponde in modo lineare:
 $$ \frac{\text{SSH}(t)}{A_0} \approx \text{costante} $$
@@ -86,27 +104,6 @@ Per quantificare eventuali effetti non lineari, abbiamo calcolato la mappa della
     \includegraphics[width=0.6\textwidth]{fig_expB_compare_nonlinear_map.png}
     \caption{Mappa della non-linearità (Differenza tra run normalizzati).}
     \label{fig:nonlinear}
-\end{figure}
-
-\subsubsection{3. Identificazione del Punto Anfidromico}
-Analizzando la varianza locale dell'SSH nel tempo (Figura \ref{fig:variance}), possiamo identificare i nodi dell'onda stazionaria (o quasi-stazionaria).
-Il minimo di varianza (zona blu scuro) indica la posizione del \textbf{Punto Anfidromico}. Per un bacino rettangolare piatto, ci aspettiamo che si trovi sull'asse centrale.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.6\textwidth]{fig_expA_ssh_variance.png}
-    \caption{Mappa della varianza SSH. I minimi indicano potenziali punti anfidromici.}
-    \label{fig:variance}
-\end{figure}
-
-\subsubsection{4. Diagramma di Hovmöller}
-Il diagramma di Hovmöller lungo la costa Est (Figura \ref{fig:hovmoller}) conferma la propagazione uniforme verso Nord senza distorsioni significative del fronte d'onda.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.8\textwidth]{fig_expA_hovmoller_east.png}
-    \caption{Diagramma di Hovmöller lungo la costa orientale.}
-    \label{fig:hovmoller}
 \end{figure}
 
 \subsection{Conclusioni}

@@ -79,7 +79,7 @@ Di seguito le variazioni dei parametri chiave per ogni esperimento condotto.
 \textbf{A} & 1 ($\Delta x \approx 10$km) & 60 & Piatta 100m & Baseline \\ \hline
 \textbf{B} & 1 ($\Delta x \approx 10$km) & 60 & Piatta 100m & $A_0 \in [0.1, 0.5, 1.0]$. Check Linearità. \\ \hline
 \textbf{C} & 1 ($\Delta x \approx 10$km) & 20 & Pendenza $1000 \to 100$m & Shoaling. $zdep\_min=100m$ per stabilità. \\ \hline
-\textbf{D} & 10 ($\Delta x \approx 1$km) & 5 & Piatta 100m & Altissima Risoluzione ($N_{steps}=17280$). \\ \hline
+\textbf{D} & 3 ($\Delta x \approx 3.3$km) & 20 & Piatta 100m & Alta Risoluzione. \\ \hline
 \end{tabular}
 \caption{Tabella riassuntiva delle configurazioni.}
 \label{tab:configs}
@@ -88,7 +88,7 @@ Di seguito le variazioni dei parametri chiave per ogni esperimento condotto.
 \subsection{Dettaglio Modifiche Codice}
 \begin{itemize}
     \item \textbf{Exp C}: Modificato \texttt{usrdef\_zgr.F90} per introdurre pendenza lineare.
-    \item \textbf{Exp D}: Modificato \texttt{namelist\_cfg} per \texttt{nn\_GYRE=10}, \texttt{rn\_Dt=5} e ripristinato \texttt{usrdef\_zgr.F90} a piatto (copia Exp B).
+    \item \textbf{Exp D}: Modificato \texttt{namelist\_cfg} per \texttt{nn\_GYRE=3}, \texttt{rn\_Dt=20} e ripristinato \texttt{usrdef\_zgr.F90} a piatto.
 \end{itemize}
 
 \end{document}
