@@ -29,6 +29,7 @@ postprocessing/*.png
 *.fls
 *.fdb_latexmk
 *.synctex.gz
+*.pdf
 postprocessing/docs/latex_aux/
 
 # NEMO Build Artifacts
