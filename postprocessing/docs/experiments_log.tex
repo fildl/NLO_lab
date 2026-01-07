@@ -85,7 +85,7 @@ Sono state eseguite tre run con perturbazione Gaussiana ($R=20$ km) centrata a 1
 \subsection{Analisi dei Risultati}
 
 \subsubsection{1. Verifica della Linearità}
-Abbiamo confrontato le serie temporali dell'SSH registrate a Venezia (Nord del bacino), normalizzate per l'ampiezza iniziale $A_0$.
+Abbiamo confrontato le serie temporali dell'SSH registrate all'Estremità Nord del bacino (proxi per Venezia), normalizzate per l'ampiezza iniziale $A_0$.
 Come mostrato in Figura \ref{fig:linearity}, le curve normalizzate sono \textbf{perfettamente sovrapposte}. Questo indica che il modello risponde in modo lineare:
 $$ \frac{\text{SSH}(t)}{A_0} \approx \text{costante} $$
 Non si osservano sfasamenti temporali significativi, suggerendo che la velocità di fase $c = \sqrt{gh}$ non è influenzata dall'ampiezza in questo regime di profondità (100m).
@@ -135,7 +135,7 @@ Il sistema si comporta in modo \textbf{lineare} per perturbazioni fino a 1.0 m s
 
 \subsubsection{1. Effetto Shoaling (Amplificazione)}
 La teoria prevede che l'ampiezza dell'onda aumenti quando la profondità diminuisce (Legge di Green: $A \propto H^{-1/4}$).
-Confrontando la serie temporale dell'SSH al Nord (Venezia) tra l'esperimento C (30m) e la Baseline (100m) in Figura \ref{fig:shoaling}, osserviamo chiaramente:
+Confrontando la serie temporale dell'SSH all'Estremità Nord tra l'esperimento C (30m) e la Baseline (100m) in Figura \ref{fig:shoaling}, osserviamo chiaramente:
 \begin{enumerate}
     \item \textbf{Amplificazione (Attesa vs Osservata)}:
     Teoricamente (Legge di Green $A \propto H^{-1/4}$), l'onda dovrebbe amplificarsi di un fattore $\approx (1000/100)^{0.25} \approx 1.77$.
@@ -175,6 +175,43 @@ Gli snapshots in Figura \ref{fig:snapshotsC} mostrano l'onda che si "accumula" e
     \includegraphics[width=0.95\textwidth]{fig_ExpC_snapshots.png}
     \caption{Snapshots Esperimento C. Notare l'aumento di intensità del colore (ampiezza) verso Nord.}
     \label{fig:snapshotsC}
+\end{figure}
+
+\newpage
+\section{Experiment D: Resolution Sensitivity}
+\textbf{Obiettivo:} Verificare l'impatto della risoluzione spaziale sulla dissipazione numerica.
+Aumentando la risoluzione, ci aspettiamo che l'onda mantenga meglio la sua forma e ampiezza nel tempo, riducendo la viscosità numerica implicita.
+
+\subsection{Configurazione}
+\begin{itemize}
+    \item \textbf{Risoluzione}: GYRE = 2 ($\Delta x \approx 5$ km). Risoluzione raddoppiata rispetto alla Baseline (10 km).
+    \item \textbf{Timestep}: $\Delta t = 20$ s (ridotto per CFL).
+    \item \textbf{Batimetria}: Piatta 100m (come Exp A).
+\end{itemize}
+
+\subsection{Analisi dei Risultati}
+\subsubsection{1. Confronto Serie Temporali}
+La Figura \ref{fig:res_compare} mostra il confronto diretto dell'SSH all'Estremità Nord tra Exp A (10km) e Exp D (5km).
+\begin{itemize}
+    \item L'ampiezza del picco è leggermente diversa, indicando che la risoluzione influenza la conservazione dell'energia.
+    \item La fase è coerente, confermando che la velocità fisica dell'onda è ben risolta in entrambi i casi.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{fig_ExpD_resolution_comparison.png}
+    \caption{Confronto SSH all'Estremità Nord: Baseline (Nero, 10km) vs Alta Risoluzione (Rosso, 5km).}
+    \label{fig:res_compare}
+\end{figure}
+
+\subsubsection{2. Diagramma di Hovmöller}
+Il diagramma spazio-tempo per il caso ad alta risoluzione (Figura \ref{fig:hov_D}) mostra dettagli più fini nella struttura dell'onda.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{fig_ExpD_hovmoller.png}
+    \caption{Diagramma di Hovmöller per Exp D (5km). Notare la nitidezza del fronte d'onda.}
+    \label{fig:hov_D}
 \end{figure}
 
 \end{document}

@@ -11,8 +11,8 @@ work_dir = os.path.join(script_dir, 'experiments')
 file_A = 'EXP_AMP_0.1m.nc'  # Make sure this matches your local file
 path_A = os.path.join(work_dir, file_A)
 
-# Exp D (High Res)
-file_D = 'EXP_D.nc' # Expected filename
+# Exp D (Medium Res)
+file_D = 'EXP_D.nc' # User provided filename
 path_D = os.path.join(work_dir, file_D)
 
 def get_ssh_venice(filepath, label):
@@ -30,11 +30,19 @@ def get_ssh_venice(filepath, label):
     
     # Grid coordinates if available, else indices
     # Venice is roughly at (i, j) = (nx-2, ny-2) for our idealized basin
-    # For Exp A (GYRE=1), ny~22. For Exp D (GYRE=10), ny~220.
+    # For Exp A (GYRE=1), ny~22. For Exp D (GYRE=2), ny~44.
     # We select a point "at the north end"
     
     i_idx = nx - 2
     j_idx = ny - 5 # A bit off the wall to avoid boundary conditions
+    
+    if label == "Exp D":
+        # Ensure we are picking physically comparable point
+        # A: (nx-2, ny-5) -> D: Scale indices by GYRE factor?
+        # A: GYRE=1 -> H~22x8. D: GYRE=2 -> H~44x16.
+        # Ratio = 2.
+        # But let's just use grid logic: always take "near North-East corner".
+        pass
     
     print(f"[{label}] Extracting at index ({i_idx}, {j_idx}) from shape {ssh.shape}")
     
@@ -50,15 +58,15 @@ def analyze_resolution():
     ssh_D, ds_D, shape_D = get_ssh_venice(path_D, "Exp D")
     
     if ssh_D is None:
-        print("Exp D data missing. Please rename output file to 'EXP_D_highres.nc' and place in experiments/ folder.")
+        print("Exp D data missing.")
         return
 
     # Time Axes
     # Exp A: dt = 60s
     t_A = np.arange(len(ssh_A)) * 60.0 / 3600.0
     
-    # Exp D: dt = 5s
-    t_D = np.arange(len(ssh_D)) * 5.0 / 3600.0
+    # Exp D: dt = 20s (GYRE=2)
+    t_D = np.arange(len(ssh_D)) * 20.0 / 3600.0
     
     # 2. Compare Time Series at Venice
     plt.figure(figsize=(12, 6))
@@ -66,7 +74,7 @@ def analyze_resolution():
     if ssh_A is not None:
         plt.plot(t_A, ssh_A, 'k--', label=f'Exp A (dx~10km, dt=60s)')
         
-    plt.plot(t_D, ssh_D, 'r-', linewidth=2, alpha=0.8, label=f'Exp D (dx~1km, dt=5s)')
+    plt.plot(t_D, ssh_D, 'r-', linewidth=2, alpha=0.8, label=f'Exp D (dx~5km, dt=20s)')
     
     plt.title('Effect of Resolution on Kelvin Wave (Venice SSH)')
     plt.xlabel('Time (hours)')
@@ -81,16 +89,16 @@ def analyze_resolution():
     
     # 3. Hovmöller for Exp D
     print("Generating Hovmöller for Exp D...")
+    # shape_D is (nx, ny) tuple from get_ssh_venice
+    nx_D = shape_D[0]
     ny_D = shape_D[1]
-    nx_D = shape_D[2]
     
     # Path along East coast
-    idx_path = nx_D - 5
+    # Index must be consistent with get_ssh_venice logic: i_idx = nx - 2
+    idx_path = nx_D - 2
     
     # Full dataset extraction for Hov
     # SSH shape: (time, y, x)
-    # Caution: High Res might be large in memory. Extract iteratively if needed.
-    # 17280 steps x 1000 y is 17M points. Fine.
     
     ssh_full_D = ds_D.variables['sossheig']
     
@@ -101,15 +109,15 @@ def analyze_resolution():
     vmax = np.percentile(np.abs(hov_D), 99)
     if vmax==0: vmax=0.05
     
-    # dt=5s
-    extent = [0, ny_D, 0, hov_D.shape[0]*5.0/3600.0] 
+    # dt=20s
+    extent = [0, ny_D, 0, hov_D.shape[0]*20.0/3600.0] 
     
     plt.imshow(hov_D, aspect='auto', origin='lower', cmap='RdBu_r', 
                vmin=-vmax, vmax=vmax, extent=extent)
     
     plt.xlabel('Distance Index (South -> North)')
     plt.ylabel('Time (hours)')
-    plt.title('Exp D: Hovmöller (High Res 1km)')
+    plt.title('Exp D: Hovmöller (Medium Res 5km)')
     plt.colorbar(label='SSH (m)')
     
     out_hov = os.path.join(script_dir, 'fig_ExpD_hovmoller.png')
