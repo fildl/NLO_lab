@@ -21,7 +21,7 @@
 !-----------------------------------------------------------------------
    cn_exp      =  "GYRE"   !  experience name
    nn_it000    =       1   !  first time step
-   nn_itend    =    4320   !  last  time step
+   nn_itend    =    1440   !  last  time step
    nn_leapy    =      30   !  Leap year calendar (1) or not (0)
    nn_stock    =    4320   !  frequency of creation of a restart file (modulo referenced to 1)
    nn_write    =      60   !  frequency of write in the output file   (modulo referenced to nn_it000)
@@ -48,7 +48,7 @@
 !-----------------------------------------------------------------------
    ln_linssh   = .true.    !  =T  linear free surface  ==>>  model level are fixed in time
    !
-   rn_Dt      = 7200.     !  time step for the dynamics
+   rn_Dt      = 60.     !  time step for the dynamics
 /
 !!======================================================================
 !!            ***  Surface Boundary Condition namelists  ***          !!

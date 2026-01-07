@@ -167,8 +167,8 @@ CONTAINS
       zphi0 = 15._wp                                     !  latitude of the most southern grid point  
       zf0   = 2. * omega * SIN( rad * zphi0 )            !  compute f0 1st point south
       !
-      pff_f(:,:) = ( zf0 + zbeta * ABS( pphif(:,:) - zphi0 ) * rad * ra ) ! f = f0 +beta* y ( y=0 at south)
-      pff_t(:,:) = ( zf0 + zbeta * ABS( pphit(:,:) - zphi0 ) * rad * ra ) ! f = f0 +beta* y ( y=0 at south)
+      pff_f(:,:) = 0._wp ! ( zf0 + zbeta * ABS( pphif(:,:) - zphi0 ) * rad * ra ) ! f = f0 +beta* y ( y=0 at south)
+      pff_t(:,:) = 0._wp ! ( zf0 + zbeta * ABS( pphit(:,:) - zphi0 ) * rad * ra ) ! f = f0 +beta* y ( y=0 at south)
       !
       IF(lwp) WRITE(numout,*) '                           beta-plane used. beta = ', zbeta, ' 1/(s.m)'
       !

@@ -80,6 +80,7 @@ Di seguito le variazioni dei parametri chiave per ogni esperimento condotto.
 \textbf{B} & 1 ($\Delta x \approx 10$km) & 60 & Piatta 100m & $A_0 \in [0.1, 0.5, 1.0]$. Check Linearità. \\ \hline
 \textbf{C} & 1 ($\Delta x \approx 10$km) & 20 & Pendenza $1000 \to 100$m & Shoaling. $zdep\_min=100m$ per stabilità. \\ \hline
 \textbf{D} & 2 ($\Delta x \approx 5$km) & 20 & Piatta 100m & Media Risoluzione (CFL Sicuro). \\ \hline
+\textbf{E} & 1 ($\Delta x \approx 10$km) & 60 & Piatta 100m & $f=0$. Validazione Fisica (No Coriolis). \\ \hline
 \end{tabular}
 \caption{Tabella riassuntiva delle configurazioni.}
 \label{tab:configs}
@@ -89,6 +90,7 @@ Di seguito le variazioni dei parametri chiave per ogni esperimento condotto.
 \begin{itemize}
     \item \textbf{Exp C}: Modificato \texttt{usrdef\_zgr.F90} per introdurre pendenza lineare.
     \item \textbf{Exp D}: Modificato \texttt{namelist\_cfg} per \texttt{nn\_GYRE=2}, \texttt{rn\_Dt=20} e ripristinato \texttt{usrdef\_zgr.F90} a piatto.
+    \item \textbf{Exp E}: Mofidicato \texttt{usrdef\_hgr.F90} per forzare \texttt{pff\_f = pff\_t = 0} (No Coriolis). Ripristinato \texttt{namelist\_cfg} alla Baseline.
 \end{itemize}
 
 \end{document}
