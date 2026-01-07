@@ -75,19 +75,21 @@ La mappa della varianza (Figura \ref{fig:varianceA}) mostra dove l'oscillazione 
 \newpage
 \subsubsection{3. Diagramma di Hovmöller}
 Il percorso di estrazione per il diagramma di Hovmöller scorre lungo la costa orientale, come mostrato in Figura \ref{fig:pathA}.
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.7\textwidth]{fig_expA_path.png}
-    \caption{Percorso di estrazione (linea rossa) per il diagramma di Hovmöller (Exp A).}
-    \label{fig:pathA}
-\end{figure}
-
 Il diagramma lungo la costa Est (Figura \ref{fig:hovmollerA}) mostra una propagazione lineare senza distorsioni.
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\textwidth]{fig_expA_hovmoller_east.png}
-    \caption{Diagramma di Hovmöller (Exp A).}
-    \label{fig:hovmollerA}
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \includegraphics[height=5.5cm]{fig_expA_path.png}
+        \caption{Percorso di estrazione (linea rossa) per il diagramma di Hovmöller (Exp A).}
+        \label{fig:pathA}
+    \end{minipage}\hfill
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \includegraphics[height=5.5cm]{fig_expA_hovmoller_east.png}
+        \caption{Diagramma di Hovmöller (Exp A).}
+        \label{fig:hovmollerA}
+    \end{minipage}
 \end{figure}
 
 \newpage
@@ -105,10 +107,10 @@ Sono state eseguite tre run con perturbazione Gaussiana ($R=20$ km) centrata a 1
 \subsection{Analisi dei Risultati}
 
 \subsubsection{1. Verifica della Linearità}
-Abbiamo confrontato le serie temporali dell'SSH registrate all'Estremità Nord del bacino (proxi per Venezia), normalizzate per l'ampiezza iniziale $A_0$.
+Abbiamo confrontato le serie temporali dell'SSH registrate all'Estremità Nord del bacino, normalizzate per l'ampiezza iniziale $A_0$.
 Come mostrato in Figura \ref{fig:linearity}, le curve normalizzate sono \textbf{perfettamente sovrapposte}. Questo indica che il modello risponde in modo lineare:
 $$ \frac{\text{SSH}(t)}{A_0} \approx \text{costante} $$
-Non si osservano sfasamenti temporali significativi, suggerendo che la velocità di fase $c = \sqrt{gh}$ non è influenzata dall'ampiezza in questo regime di profondità (100m).
+Non si osservano sfasamenti temporali, la velocità di fase $c = \sqrt{gh}$ non è influenzata dall'ampiezza in questo regime di profondità (100m).
 
 \begin{figure}[H]
     \centering
@@ -117,13 +119,30 @@ Non si osservano sfasamenti temporali significativi, suggerendo che la velocità
     \label{fig:linearity}
 \end{figure}
 
-Per quantificare eventuali effetti non lineari, abbiamo calcolato la mappa della varianza della differenza tra i run normalizzati (Figura \ref{fig:nonlinear}). I valori sono trascurabili, confermando la linearità.
+Per quantificare eventuali effetti non lineari e identificare il punto anfidromico, mostriamo le analisi spaziali in Figura \ref{fig:expB_maps}.
+
+La mappa di non-linearità (sinistra) mostra la varianza della differenza tra i campi normalizzati:
+$$ \text{Var} \left( \frac{\text{SSH}_{1.0}}{1.0} - \frac{\text{SSH}_{0.1}}{0.1} \right) $$
+In un regime perfettamente lineare, questa differenza sarebbe zero ovunque. I valori osservati sono estremamente bassi (ordine $10^{-7}$ m$^2$), confermando che per ampiezze fino a 1m la dinamica è dominata dalla fisica lineare. Eventuali residui sono localizzati vicino alle coste.//
+
+La mappa a destra mostra la varianza totale del segnale, evidenziando (più o meno) il minimo centrale (punto anfidromico) attorno al quale l'onda ruota.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.6\textwidth]{fig_expB_compare_nonlinear_map.png}
-    \caption{Mappa della non-linearità (Differenza tra run normalizzati).}
-    \label{fig:nonlinear}
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{fig_expB_compare_nonlinear_map.png}
+        \caption{Mappa Non-linearità (Residui)}
+        \label{fig:nonlinear}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{fig_expB_compare_amphidromic.png}
+        \caption{Punto Anfidromico (Varianza SSH)}
+        \label{fig:variance}
+    \end{minipage}
+    \caption{Analisi Spaziale Exp B.}
+    \label{fig:expB_maps}
 \end{figure}
 
 \subsection{Conclusioni}
@@ -137,16 +156,16 @@ Il sistema si comporta in modo \textbf{lineare} per perturbazioni fino a 1.0 m s
 \begin{itemize}
     \item \textbf{Batimetria}: Pendenza lineare $H(y)$ lungo l'asse Nord-Sud.
     $$ H(y) = 1000 \text{m (Sud)} \to 100 \text{m (Nord)} $$
-    \textit{Nota: La profondità minima è stata portata a 100m (inizialmente 30m) per evitare problemi di risoluzione verticale. Con 31 livelli ($jpk=31$), ogni livello è alto circa 33m; una profondità di 30m avrebbe comportato un singolo livello attivo ("step" ripido), causando riflessioni spurie e perdita di energia.}
+    \textit{Nota: La profondità minima è stata portata a 100m (inizialmente 30m) per evitare problemi di risoluzione verticale. Con 31 livelli ($jpk=31$), ogni livello è alto circa 33m; una profondità di 30m avrebbe comportato un singolo livello, causando problemi.}
     
-    La visualizzazione 3D del dominio è in Figura \ref{fig:bathyC}.
-    \item \textbf{Perturbazione}: $A_0 = 0.1$ m (Regime Lineare) centrata a Sud-Est (Canale d'Otranto).
+    La visualizzazione del dominio è in Figura \ref{fig:bathyC}.
+    \item \textbf{Perturbazione}: $A_0 = 0.1$ m (Regime Lineare) centrata a Sud-Est.
     \item \textbf{Parametri Numerici}: A causa della maggiore profondità ($H=1000$m $\Rightarrow c \approx 100$ m/s), il timestep è stato ridotto a $\Delta t = 20$ s (invece di 60 s) per soddisfare la condizione CFL. Durata totale mantenuta a 24h ($N_{steps} = 4320$).
 \end{itemize}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{fig_ExpC_bathymetry_3D.png}
+    \includegraphics[width=0.5\textwidth]{fig_ExpC_bathymetry_3D.png}
     \caption{Batimetria 3D Esperimento C: Pendenza lineare lungo Y.}
     \label{fig:bathyC}
 \end{figure}
@@ -154,7 +173,8 @@ Il sistema si comporta in modo \textbf{lineare} per perturbazioni fino a 1.0 m s
 \subsection{Analisi dei Risultati}
 
 \subsubsection{1. Effetto Shoaling (Amplificazione)}
-La teoria prevede che l'ampiezza dell'onda aumenti quando la profondità diminuisce (Legge di Green: $A \propto H^{-1/4}$).
+La teoria prevede che l'ampiezza dell'onda aumenti quando la profondità diminuisce. Per un canale a larghezza costante, la Legge di Green stabilisce che:
+$$ A \propto H^{-1/4} $$
 Confrontando la serie temporale dell'SSH all'Estremità Nord tra l'esperimento C (30m) e la Baseline (100m) in Figura \ref{fig:shoaling}, osserviamo chiaramente:
 \begin{enumerate}
     \item \textbf{Amplificazione (Attesa vs Osservata)}:
@@ -170,15 +190,14 @@ Confrontando la serie temporale dell'SSH all'Estremità Nord tra l'esperimento C
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.8\textwidth]{fig_ExpC_shoaling_comparison.png}
-    \caption{Confronto SSH a Nord: Exp C (Rosso, 30m) vs Baseline (Nero, 100m). Evidente lo shoaling e il ritardo di fase.}
+    \caption{Confronto SSH a Nord: Exp C (Rosso, batimetria lineare) vs Baseline (Nero, batimetria piatta). Evidente lo shoaling e lo sfasamento.}
     \label{fig:shoaling}
 \end{figure}
 
 \subsubsection{2. Diagramma di Hovmöller e Velocità Teorica}
-Il diagramma spazio-tempo (Figura \ref{fig:hovmollerC}) conferma la natura fisica della propagazione.
-Abbiamo sovrapposto la curva teorica del tempo di arrivo $t(y)$, calcolata integrando la velocità di fase locale (dipendente dalla profondità $H(y)$):
+Nel diagramma spazio-tempo (Figura \ref{fig:hovmollerC}) viene sovrapposta la curva teorica del tempo di arrivo $t(y)$, calcolata integrando la velocità di fase locale (dipendente dalla profondità $H(y)$):
 $$ t(y) = \int_0^y \frac{dy'}{\sqrt{g H(y')}} $$
-La pendenza della traccia numerica segue perfettamente la curva teorica (linea tratteggiata), confermando che l'onda viaggia alla velocità corretta data dalla batimetria. La curvatura indica la decelerazione progressiva mentre l'onda risale verso acque più basse.
+La pendenza della traccia numerica segue la curva teorica (linea tratteggiata), confermando che l'onda viaggia alla velocità corretta data dalla batimetria. La leggera curvatura indica la decelerazione progressiva mentre l'onda risale verso acque meno profonde.
 
 \begin{figure}[H]
     \centering

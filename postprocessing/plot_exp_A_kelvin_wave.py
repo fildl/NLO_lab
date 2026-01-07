@@ -96,7 +96,7 @@ def analyze_wave():
         ax_path.set_xlabel('Longitude (°E)')
         ax_path.set_ylabel('Latitude (°N)')
         ax_path.set_aspect('equal')
-        plt.savefig(os.path.join(script_dir, 'fig_expA_path.png'), dpi=300)
+        plt.savefig(os.path.join(script_dir, 'fig_expA_path.png'), dpi=300, bbox_inches='tight')
         print("Saved fig_expA_path.png")
 
     plt.figure(figsize=(10, 8))
@@ -197,7 +197,7 @@ def analyze_wave():
     # Add shared colorbar
     fig.colorbar(im, ax=axes, orientation='horizontal', fraction=0.05, pad=0.02, label='SSH (m)')
     
-    plt.savefig(os.path.join(script_dir, 'fig_expA_ssh_snapshots.png'), dpi=300)
+    plt.savefig(os.path.join(script_dir, 'fig_expA_ssh_snapshots.png'), dpi=300, bbox_inches='tight')
     print(f"Saved {os.path.join(script_dir, 'fig_expA_ssh_snapshots.png')}")
 
     # --- 3. Variance Map (Geo) ---

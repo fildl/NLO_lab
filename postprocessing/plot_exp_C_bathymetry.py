@@ -221,7 +221,7 @@ def analyze_exp_c():
         ax.plot(path_lons, path_lats, 'r-', linewidth=2, label='Hovmöller Path')
         ax.legend(loc='upper right')
         
-        plt.savefig(os.path.join(script_dir, 'fig_ExpC_bathymetry_3D.png'), dpi=300) # Keep filename as requested by user flow implies replacing
+        plt.savefig(os.path.join(script_dir, 'fig_ExpC_bathymetry_3D.png'), dpi=300, bbox_inches='tight') # Keep filename as requested by user flow implies replacing
         print("Saved fig_ExpC_bathymetry_3D.png (2D Map version with path)")
     else:
         print("Cannot plot Bathymetry without Longitude/Latitude data.")

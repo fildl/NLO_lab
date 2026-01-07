@@ -98,7 +98,7 @@ def compare_runs_20km():
             plt.ylim(extent[2], extent[3])
         plt.axis('equal') # Aspect ratio
         plt.tight_layout()
-        plt.savefig(os.path.join(script_dir, 'fig_expB_compare_nonlinear_map.png'), dpi=300)
+        plt.savefig(os.path.join(script_dir, 'fig_expB_compare_nonlinear_map.png'), dpi=300, bbox_inches='tight')
         print(f"Saved {os.path.join(script_dir, 'fig_expB_compare_nonlinear_map.png')}")
 
     # --- 3. Variance Map (Amphidromic Point Search) ---
@@ -129,7 +129,7 @@ def compare_runs_20km():
         plt.ylim(extent[2], extent[3])
     plt.axis('equal')
     plt.tight_layout()
-    plt.savefig(os.path.join(script_dir, 'fig_expB_compare_amphidromic.png'), dpi=300) 
+    plt.savefig(os.path.join(script_dir, 'fig_expB_compare_amphidromic.png'), dpi=300, bbox_inches='tight') 
     print(f"Saved {os.path.join(script_dir, 'fig_expB_compare_amphidromic.png')}")
 
 if __name__ == "__main__":
