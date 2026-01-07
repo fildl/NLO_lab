@@ -214,7 +214,8 @@ def analyze_wave():
     print(f"Variance Map Vmax: {vmax}")
 
     # Use subplots with constrained_layout
-    fig, ax = plt.subplots(figsize=(8, 10), constrained_layout=True)
+    # Adjusted figsize to be narrower to minimize whitespace for narrow basin
+    fig, ax = plt.subplots(figsize=(5, 9), constrained_layout=True)
     
     if 'lon' in locals() and lon is not None:
         im = ax.pcolormesh(lon, lat, ssh_var, cmap='viridis', shading='auto', vmax=vmax)
@@ -232,7 +233,8 @@ def analyze_wave():
     fig.colorbar(im, ax=ax, label='SSH Variance ($m^2$)', shrink=0.8)
     ax.set_title('SSH Variance (Node Identification)')
     
-    plt.savefig(os.path.join(script_dir, 'fig_expA_ssh_variance.png'), dpi=300)
+    # bbox_inches='tight' removes extra whitespace around the plot
+    plt.savefig(os.path.join(script_dir, 'fig_expA_ssh_variance.png'), dpi=300, bbox_inches='tight')
     print(f"Saved {os.path.join(script_dir, 'fig_expA_ssh_variance.png')}")
 
     ds.close()

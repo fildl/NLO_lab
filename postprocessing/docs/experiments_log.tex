@@ -16,6 +16,8 @@
 \begin{document}
 
 \maketitle
+\tableofcontents
+\newpage
 
 \section{Introduzione}
 Questo documento raccoglie i risultati delle prove di sensibilità effettuate sul modello NEMO per il caso TIDES (propagazione Onda di Kelvin in Adriatico idealizzato).
@@ -25,10 +27,54 @@ L'obiettivo è analizzare la risposta del modello variando parametri come l'ampi
 \textbf{Obiettivo:} Stabilire una simulazione stabile.
 \subsection{Configurazione}
 \begin{itemize}
-    \item \textbf{Configurazione}: $A_0 = 1.0$m, Batimetria piatta 100m.
-    \item \textbf{Estrazione}: Il percorso di estrazione per il diagramma di Hovmöller è mostrato in Figura \ref{fig:pathA}.
+    \item \textbf{Dominio}: Bacino idealizzato rettangolare per approssimare l'Adriatico.
+    \begin{itemize}
+        \item Batimetria: Piatta costante $H = 100$ m.
+        \item Risoluzione Orizzontale: $\Delta x \approx 10$ km (\texttt{nn\_GYRE = 1}).
+        \item Risoluzione Verticale: 31 livelli ($z$-coordinates).
+    \end{itemize}
+    \item \textbf{Perturbazione Iniziale}:
+    \begin{itemize}
+        \item Tipo: Anomalia Gaussiana di SSH.
+        \item Ampiezza: $A_0 = 1.0$ m.
+        \item Posizione: Centrata a $19.0^\circ$E, $40.5^\circ$N (Angolo Sud-Est, analogo al Canale d'Otranto).
+        \item Dimensione: Raggio $\sigma = 20$ km.
+    \end{itemize}
+    \item \textbf{Setup Numerico}:
+    \begin{itemize}
+        \item Timestep: $\Delta t = 60$ s.
+        \item Durata: 24 ore.
+    \end{itemize}
 \end{itemize}
 
+\subsection{Risultati}
+Simulazione stabile con timestep 60s.
+
+\newpage
+\subsubsection{1. Evoluzione Spaziale}
+La propagazione dell'onda è mostrata in Figura \ref{fig:snapshotsA}. L'onda viaggia in senso antiorario lungo i bordi del bacino (Kelvin Wave).
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{fig_expA_ssh_snapshots.png}
+    \caption{Snapshots SSH per Experiment A (Baseline).}
+    \label{fig:snapshotsA}
+\end{figure}
+
+\newpage
+\subsubsection{2. Analisi della Varianza (Punto Anfidromico)}
+La mappa della varianza (Figura \ref{fig:varianceA}) mostra dove l'oscillazione è massima (antinodi, ai bordi) e dove è minima. Il minimo centrale indica il potenziale punto anfidromico.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{fig_expA_ssh_variance.png}
+    \caption{Mappa della Varianza SSH (Exp A). Il blu scuro al centro indica il nodo dell'onda stazionaria.}
+    \label{fig:varianceA}
+\end{figure}
+
+\newpage
+\subsubsection{3. Diagramma di Hovmöller}
+Il percorso di estrazione per il diagramma di Hovmöller scorre lungo la costa orientale, come mostrato in Figura \ref{fig:pathA}.
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.7\textwidth]{fig_expA_path.png}
@@ -36,32 +82,6 @@ L'obiettivo è analizzare la risposta del modello variando parametri come l'ampi
     \label{fig:pathA}
 \end{figure}
 
-\subsection{Risultati}
-\begin{itemize}
-    \item \textbf{Risultato}: Simulazione stabile con timestep 60s.
-\end{itemize}
-
-\subsubsection{1. Evoluzione Spaziale}
-La propagazione dell'onda è mostrata in Figura \ref{fig:snapshotsA}. L'onda viaggia in senso antiorario lungo i bordi del bacino (Kelvin Wave).
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.95\textwidth]{fig_expA_ssh_snapshots.png}
-    \caption{Snapshots SSH per Experiment A (Baseline). Notare il movimento antiorario.}
-    \label{fig:snapshotsA}
-\end{figure}
-
-\subsubsection{2. Analisi della Varianza (Punto Anfidromico)}
-La mappa della varianza (Figura \ref{fig:varianceA}) mostra dove l'oscillazione è massima (antinodi, ai bordi) e dove è minima. Il minimo centrale indica il potenziale punto anfidromico.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.7\textwidth]{fig_expA_ssh_variance.png}
-    \caption{Mappa della Varianza SSH (Exp A). Il blu scuro al centro indica il nodo dell'onda stazionaria.}
-    \label{fig:varianceA}
-\end{figure}
-
-\subsubsection{3. Diagramma di Hovmöller}
 Il diagramma lungo la costa Est (Figura \ref{fig:hovmollerA}) mostra una propagazione lineare senza distorsioni.
 \begin{figure}[H]
     \centering
@@ -77,9 +97,9 @@ Il diagramma lungo la costa Est (Figura \ref{fig:hovmollerA}) mostra una propaga
 \subsection{Configurazione}
 Sono state eseguite tre run con perturbazione Gaussiana ($R=20$ km) centrata a 19.0°E, 40.5°N:
 \begin{itemize}
-    \item \textbf{AMP0.1}: $A_0 = 0.1$ m (Regime Lineare)
+    \item \textbf{AMP0.1}: $A_0 = 0.1$ m
     \item \textbf{AMP0.5}: $A_0 = 0.5$ m
-    \item \textbf{AMP1.0}: $A_0 = 1.0$ m (Regime Alta Ampiezza)
+    \item \textbf{AMP1.0}: $A_0 = 1.0$ m
 \end{itemize}
 
 \subsection{Analisi dei Risultati}
