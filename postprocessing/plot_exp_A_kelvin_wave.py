@@ -108,7 +108,7 @@ def analyze_wave():
                vmin=-h_vmax, vmax=h_vmax,
                extent=[0, ny*10, 0, ssh.shape[0]*60/3600])
     plt.colorbar(label='SSH (m)')
-    plt.xlabel('Distance along Coast (km approx)')
+    plt.xlabel('Distance along Coast (km)')
     plt.ylabel('Time (hours)')
     plt.title('Hovmöller Diagram (East Coast Path)')
     plt.savefig(os.path.join(script_dir, 'fig_expA_hovmoller_east.png'), dpi=300)

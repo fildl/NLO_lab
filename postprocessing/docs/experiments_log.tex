@@ -29,14 +29,16 @@ L'obiettivo è analizzare la risposta del modello variando parametri come l'ampi
 \begin{itemize}
     \item \textbf{Dominio}: Bacino idealizzato rettangolare per approssimare l'Adriatico.
     \begin{itemize}
+        \item Estensione: Lon $[17.75^\circ\text{E}, 19.64^\circ\text{E}]$, Lat $[40^\circ\text{N}, 49^\circ\text{N}]$.
+        \item Dimensioni Griglia: $22 \times 102$ punti ($x, y$).
         \item Batimetria: Piatta costante $H = 100$ m.
-        \item Risoluzione Orizzontale: $\Delta x \approx 10$ km (\texttt{nn\_GYRE = 1}).
-        \item Risoluzione Verticale: 31 livelli ($z$-coordinates).
+        \item Risoluzione Orizzontale: $\Delta x = 10$ km (\texttt{nn\_GYRE = 1}).
+        \item Risoluzione Verticale: 31 livelli.
     \end{itemize}
     \item \textbf{Perturbazione Iniziale}:
     \begin{itemize}
         \item Tipo: Anomalia Gaussiana di SSH.
-        \item Ampiezza: $A_0 = 1.0$ m.
+        \item Ampiezza: $A_0 = 0.1$ m.
         \item Posizione: Centrata a $19.0^\circ$E, $40.5^\circ$N (Angolo Sud-Est, analogo al Canale d'Otranto).
         \item Dimensione: Raggio $\sigma = 20$ km.
     \end{itemize}
@@ -52,21 +54,21 @@ Simulazione stabile con timestep 60s.
 
 \newpage
 \subsubsection{1. Evoluzione Spaziale}
-La propagazione dell'onda è mostrata in Figura \ref{fig:snapshotsA}. L'onda viaggia in senso antiorario lungo i bordi del bacino (Kelvin Wave).
+La propagazione dell'onda di Kelvin è mostrata in Figura \ref{fig:snapshotsA}. L'onda viaggia in senso antiorario lungo i bordi del bacino.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{fig_expA_ssh_snapshots.png}
+    \includegraphics[width=0.85\textwidth]{fig_expA_ssh_snapshots.png}
     \caption{Snapshots SSH per Experiment A (Baseline).}
     \label{fig:snapshotsA}
 \end{figure}
 
 \subsubsection{2. Analisi della Varianza (Punto Anfidromico)}
-La mappa della varianza (Figura \ref{fig:varianceA}) mostra dove l'oscillazione è massima (antinodi, ai bordi) e dove è minima. Il minimo centrale indica il potenziale punto anfidromico.
+La mappa della varianza (Figura \ref{fig:varianceA}) mostra dove l'oscillazione è massima (antinodi, agli angoli e ai bordi) e dove è minima (al centro). La regione centrale indica il potenziale punto anfidromico.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.2\textwidth]{fig_expA_ssh_variance.png}
+    \includegraphics[width=0.25\textwidth]{fig_expA_ssh_variance.png}
     \caption{Mappa della Varianza SSH (Exp A). Il blu scuro al centro indica il nodo dell'onda stazionaria.}
     \label{fig:varianceA}
 \end{figure}
@@ -84,7 +86,7 @@ Il diagramma lungo la costa Est (Figura \ref{fig:hov_A}, destra) mostra una prop
 
 \newpage
 \section{Experiment B: Amplitude Sensitivity (Linearity Check)}
-\textbf{Obiettivo:} Verificare la linearità della risposta del modello (SSH Output vs Input) e la dipendenza della velocità di fase dall'ampiezza.
+\textbf{Obiettivo:} Verificare la linearità della risposta del modello (SSH Input vs Output) e la dipendenza della velocità di fase dall'ampiezza.
 
 \subsection{Configurazione}
 Sono state eseguite tre run con perturbazione Gaussiana ($R=20$ km) centrata a 19.0°E, 40.5°N:
@@ -97,26 +99,31 @@ Sono state eseguite tre run con perturbazione Gaussiana ($R=20$ km) centrata a 1
 \subsection{Analisi dei Risultati}
 
 \subsubsection{1. Verifica della Linearità}
-Abbiamo confrontato le serie temporali dell'SSH registrate all'Estremità Nord del bacino, normalizzate per l'ampiezza iniziale $A_0$.
-Come mostrato in Figura \ref{fig:linearity}, le curve normalizzate sono \textbf{perfettamente sovrapposte}. Questo indica che il modello risponde in modo lineare:
+La Figura \ref{fig:linearity} mostra il confronto delle serie temporali di SSH registrate all'Estremità Nord del bacino, normalizzate per l'ampiezza iniziale $A_0$.
+Si osserva che le curve normalizzate sono perfettamente sovrapposte. Questo indica che il modello risponde in modo lineare:
 $$ \frac{\text{SSH}(t)}{A_0} \approx \text{costante} $$
 Non si osservano sfasamenti temporali, la velocità di fase $c = \sqrt{gh}$ non è influenzata dall'ampiezza in questo regime di profondità (100m).
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.8\textwidth]{fig_expB_compare_linearity.png}
-    \caption{Confronto delle serie temporali normalizzate all'Estremità Nord. La sovrapposizione indica una risposta lineare.}
+    \caption{Confronto delle serie temporali normalizzate all'Estremità Nord.}
     \label{fig:linearity}
 \end{figure}
 
-Per quantificare eventuali effetti non lineari e identificare il punto anfidromico, mostriamo le analisi spaziali in Figura \ref{fig:expB_maps}.
+\noindent
+Per quantificare eventuali effetti non lineari e identificare il punto anfidromico, mostriamo le analisi spaziali nelle Figure \ref{fig:nonlinear} e \ref{fig:variance}.
 
 La mappa di non-linearità (sinistra) mostra la varianza della differenza tra i campi normalizzati:
 $$ \text{Var} \left( \frac{\text{SSH}_{1.0}}{1.0} - \frac{\text{SSH}_{0.1}}{0.1} \right) $$
-In un regime perfettamente lineare, questa differenza sarebbe zero ovunque. I valori osservati sono estremamente bassi (ordine $10^{-7}$ m$^2$), confermando che per ampiezze fino a 1m la dinamica è dominata dalla fisica lineare. Eventuali residui sono localizzati vicino alle coste.//
+In un regime perfettamente lineare, questa differenza sarebbe zero ovunque. I valori osservati sono estremamente bassi (ordine $10^{-7}$ m$^2$), confermando che per ampiezze fino a 1m la dinamica è dominata dalla fisica lineare. Eventuali residui sono localizzati vicino alle coste.
 
-La mappa a destra mostra la varianza totale del segnale, evidenziando (più o meno) il minimo centrale (punto anfidromico) attorno al quale l'onda ruota.
 
+La mappa a destra (Figura \ref{fig:variance}) mostra la varianza totale della SSH nel tempo.
+\begin{itemize}
+    \item \textbf{Significato Fisico}: La varianza è una misura dell'energia dell'onda in quel punto ($\text{Var} \propto \langle \eta^2 \rangle$). Le zone rosse (alta varianza) corrispondono agli antinodi, dove l'oscillazione verticale è massima (lungo le coste).
+    \item \textbf{Punto Anfidromico}: La zona blu scuro al centro rappresenta un minimo globale di varianza (quasi zero). Questo è il \textit{Punto Anfidromico}, un nodo immobile attorno al quale l'onda di marea/Kelvin ruota. In questo punto, l'elevazione della superficie rimane costante mentre l'onda gli gira attorno.
+\end{itemize}
 \begin{figure}[H]
     \centering
     \begin{minipage}{0.48\textwidth}
@@ -131,8 +138,6 @@ La mappa a destra mostra la varianza totale del segnale, evidenziando (più o me
         \caption{Punto Anfidromico (Varianza SSH)}
         \label{fig:variance}
     \end{minipage}
-    \caption{Analisi Spaziale Exp B.}
-    \label{fig:expB_maps}
 \end{figure}
 
 \subsection{Conclusioni}
@@ -146,17 +151,17 @@ Il sistema si comporta in modo \textbf{lineare} per perturbazioni fino a 1.0 m s
 \begin{itemize}
     \item \textbf{Batimetria}: Pendenza lineare $H(y)$ lungo l'asse Nord-Sud.
     $$ H(y) = 1000 \text{m (Sud)} \to 100 \text{m (Nord)} $$
-    \textit{Nota: La profondità minima è stata portata a 100m (inizialmente 30m) per evitare problemi di risoluzione verticale. Con 31 livelli ($jpk=31$), ogni livello è alto circa 33m; una profondità di 30m avrebbe comportato un singolo livello, causando problemi.}
+    &\textit{Nota: La profondità minima è stata portata a 100m (inizialmente 30m) per evitare problemi di risoluzione verticale. Con 31 livelli ($jpk=31$), ogni livello è alto circa 33m; una profondità di 30m avrebbe comportato un singolo livello, causando problemi.}
     
     La visualizzazione del dominio è in Figura \ref{fig:bathyC}.
-    \item \textbf{Perturbazione}: $A_0 = 0.1$ m (Regime Lineare) centrata a Sud-Est.
+    \item \textbf{Perturbazione}: $A_0 = 0.1$ m centrata a Sud-Est.
     \item \textbf{Parametri Numerici}: A causa della maggiore profondità ($H=1000$m $\Rightarrow c \approx 100$ m/s), il timestep è stato ridotto a $\Delta t = 20$ s (invece di 60 s) per soddisfare la condizione CFL. Durata totale mantenuta a 24h ($N_{steps} = 4320$).
 \end{itemize}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.25\textwidth]{fig_ExpC_bathymetry_3D.png}
-    \caption{Batimetria Esperimento C: Pendenza lineare lungo Y.}
+    \caption{Batimetria Esperimento C: Pendenza lineare lungo $y$.}
     \label{fig:bathyC}
 \end{figure}
 

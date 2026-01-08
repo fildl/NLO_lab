@@ -22,8 +22,8 @@ Questo documento riassume i passaggi eseguiti per configurare l'esperimento \tex
 \section{Struttura delle Directory}
 \begin{itemize}
     \item \textbf{NEMO Root}: \texttt{/home/STUDENTI/filippo.diludovico/nlo/nemo\_4.2.0}
-    \item \textbf{Configurazione}: \texttt{cfgs/TIDES} (copiata da \texttt{GYRE\_PISCES})
-    \item \textbf{Directory di lavoro}: \texttt{.../Uni/NLO/03\_tides/TIDES/EXP00/tmp\_work}
+    \item \textbf{Configurazione}: \texttt{cfgs/TIDES2} (copiata da \texttt{GYRE\_PISCES})
+    \item \textbf{Directory locale}: \texttt{.../Uni/NLO/03\_tides/TIDES/EXP00/tmp\_work}
 \end{itemize}
 
 \section{File Modificati}
@@ -32,8 +32,8 @@ Di seguito il dettaglio delle modifiche apportate in \texttt{MY\_SRC}.
 \subsection{usrdef\_hgr.F90 (Griglia Orizzontale)}
 Modificato per definire il dominio Adriatico idealizzato.
 \begin{itemize}
-    \item \textbf{Origine}: 16°E, 40°N
-    \item \textbf{Risoluzione}: $\sim 10$ km (\texttt{nn\_GYRE = 1})
+    \item \textbf{Origine}: 16°E, 40°N (Genera estensione effettiva $\sim 17.75^\circ$E - $19.64^\circ$E)
+    \item \textbf{Risoluzione}: 10 km (\texttt{nn\_GYRE = 1})
     \item \textbf{Rotazione}: Nessuna ($\sin \alpha = 0, \cos \alpha = 1$)
 \end{itemize}
 
@@ -46,9 +46,9 @@ ze1 = 10000._wp / REAL( nn_GYRE , wp )
 \subsection{usrdef\_istate.F90 (Stato Iniziale)}
 Adattato da \texttt{TSUNAMI} per generare una perturbazione Gaussiana dell'SSH.
 \begin{itemize}
-    \item \textbf{Centro}: 19.0°E, 40.5°N (Canale d'Otranto, più a Ovest per evitare confini)
+    \item \textbf{Centro}: 19.0°E, 40.5°N
     \item \textbf{Raggio ($R$)}: 20 km (aggiornato da 50km per segnale più pulito)
-    \item \textbf{Ampiezza ($A_0$)}: Variabile (0.05m, 0.5m, 1.0m)
+    \item \textbf{Ampiezza ($A_0$)}: Variabile (0.1m, 0.5m, 1.0m)
 \end{itemize}
 
 \subsection{usrdef\_nam.F90 (Dimensioni)}
@@ -73,7 +73,8 @@ Di seguito le variazioni dei parametri chiave per ogni esperimento condotto.
 
 \begin{table}[h]
 \centering
-\begin{tabularx}{\textwidth}{|l|c|c|l|X|}
+\renewcommand{\tabularxcolumn}[1]{>{\centering\arraybackslash}m{#1}}
+\begin{tabularx}{\textwidth}{|c|c|c|c|X|}
 \hline
 \textbf{Exp} & \textbf{nn\_GYRE} & \textbf{rn\_Dt (s)} & \textbf{Batimetria} & \textbf{Note} \\ \hline
 
