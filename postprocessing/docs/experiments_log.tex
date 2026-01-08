@@ -58,7 +58,7 @@ La propagazione dell'onda di Kelvin è mostrata in Figura \ref{fig:snapshotsA}. 
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.85\textwidth]{fig_expA_ssh_snapshots.png}
+    \includegraphics[width=0.8\textwidth]{fig_expA_ssh_snapshots.png}
     \caption{Snapshots SSH per Experiment A (Baseline).}
     \label{fig:snapshotsA}
 \end{figure}
@@ -120,10 +120,6 @@ In un regime perfettamente lineare, questa differenza sarebbe zero ovunque. I va
 
 
 La mappa a destra (Figura \ref{fig:variance}) mostra la varianza totale della SSH nel tempo.
-\begin{itemize}
-    \item \textbf{Significato Fisico}: La varianza è una misura dell'energia dell'onda in quel punto ($\text{Var} \propto \langle \eta^2 \rangle$). Le zone rosse (alta varianza) corrispondono agli antinodi, dove l'oscillazione verticale è massima (lungo le coste).
-    \item \textbf{Punto Anfidromico}: La zona blu scuro al centro rappresenta un minimo globale di varianza (quasi zero). Questo è il \textit{Punto Anfidromico}, un nodo immobile attorno al quale l'onda di marea/Kelvin ruota. In questo punto, l'elevazione della superficie rimane costante mentre l'onda gli gira attorno.
-\end{itemize}
 \begin{figure}[H]
     \centering
     \begin{minipage}{0.48\textwidth}
@@ -151,7 +147,6 @@ Il sistema si comporta in modo \textbf{lineare} per perturbazioni fino a 1.0 m s
 \begin{itemize}
     \item \textbf{Batimetria}: Pendenza lineare $H(y)$ lungo l'asse Nord-Sud.
     $$ H(y) = 1000 \text{m (Sud)} \to 100 \text{m (Nord)} $$
-    &\textit{Nota: La profondità minima è stata portata a 100m (inizialmente 30m) per evitare problemi di risoluzione verticale. Con 31 livelli ($jpk=31$), ogni livello è alto circa 33m; una profondità di 30m avrebbe comportato un singolo livello, causando problemi.}
     
     La visualizzazione del dominio è in Figura \ref{fig:bathyC}.
     \item \textbf{Perturbazione}: $A_0 = 0.1$ m centrata a Sud-Est.
@@ -160,7 +155,7 @@ Il sistema si comporta in modo \textbf{lineare} per perturbazioni fino a 1.0 m s
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.25\textwidth]{fig_ExpC_bathymetry_3D.png}
+    \includegraphics[width=0.3\textwidth]{fig_ExpC_bathymetry_3D.png}
     \caption{Batimetria Esperimento C: Pendenza lineare lungo $y$.}
     \label{fig:bathyC}
 \end{figure}
@@ -170,7 +165,7 @@ Il sistema si comporta in modo \textbf{lineare} per perturbazioni fino a 1.0 m s
 \subsubsection{1. Effetto Shoaling (Amplificazione)}
 La teoria prevede che l'ampiezza dell'onda aumenti quando la profondità diminuisce. Per un canale a larghezza costante, la Legge di Green stabilisce che:
 $$ A \propto H^{-1/4} $$
-Confrontando la serie temporale dell'SSH all'Estremità Nord tra l'esperimento C (30m) e la Baseline (100m) in Figura \ref{fig:shoaling}, osserviamo chiaramente:
+Confrontando la serie temporale dell'SSH all'Estremità Nord tra l'esperimento C (100m) e la Baseline (100m) in Figura \ref{fig:shoaling}, osserviamo chiaramente:
 \begin{enumerate}
     \item \textbf{Amplificazione (Attesa vs Osservata)}:
     Teoricamente (Legge di Green $A \propto H^{-1/4}$), l'onda dovrebbe amplificarsi di un fattore $\approx (1000/100)^{0.25} \approx 1.77$.
@@ -182,6 +177,18 @@ Confrontando la serie temporale dell'SSH all'Estremità Nord tra l'esperimento C
     \item \textbf{Velocità di Fase (Corretta)}: L'onda arriva al Nord dopo circa 4 ore, contro le 9 ore del caso a 100m. Questo è fisicamente corretto e coerente con la maggiore velocità media in acqua profonda.
 \end{enumerate}
 
+\noindent
+Per visualizzare meglio l'evoluzione dell'ampiezza lungo tutto il percorso, abbiamo estratto il valore massimo dell'SSH lungo la costa orientale.
+La Figura \ref{fig:shoaling_profile} mostra il confronto tra l'ampiezza osservata (blu) e quella teorica prevista dalla Legge di Green (rosso).
+Si nota che l'onda parte correttamente (ampiezza $\approx 0.1$m), ma invece di crescere esponenzialmente mentre la profondità diminuisce (linea rossa), l'ampiezza osservata decade. Questo conferma che la dispersione (fisica e numerica) domina sullo shoaling in questa configurazione.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{fig_ExpC_shoaling_profile.png}
+    \caption{Profilo di Shoaling: Ampiezza massima lungo la costa vs Legge di Green teorica.}
+    \label{fig:shoaling_profile}
+\end{figure}
+
 \begin{figure}[H]
     \centering
     \includegraphics[width=1.0\textwidth]{fig_ExpC_shoaling_comparison.png}
@@ -189,7 +196,7 @@ Confrontando la serie temporale dell'SSH all'Estremità Nord tra l'esperimento C
     \label{fig:shoaling}
 \end{figure}
 
-\subsubsection{2. Diagramma di Hovmöller e Velocità Teorica}
+\subsubsection{2. Diagramma di Hovmöller}
 Nel diagramma spazio-tempo (Figura \ref{fig:hovmollerC}) viene sovrapposta la curva teorica del tempo di arrivo $t(y)$, calcolata integrando la velocità di fase locale (dipendente dalla profondità $H(y)$):
 $$ t(y) = \int_0^y \frac{dy'}{\sqrt{g H(y')}} $$
 La pendenza della traccia numerica segue la curva teorica (linea tratteggiata), confermando che l'onda viaggia alla velocità corretta data dalla batimetria. La leggera curvatura indica la decelerazione progressiva mentre l'onda risale verso acque meno profonde.
