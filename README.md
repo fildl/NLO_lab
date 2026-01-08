@@ -1,5 +1,10 @@
 # NEMO Tides Experiment
 
+> [!IMPORTANT]
+> **University Project Disclaimer**: This repository contains code for a university project. It is **not** intended for public replication or general use. The simulations are configured to run on a specific remote cluster environment and **will not work locally** without significant modification.
+>
+> **Usable Content**: The only part of this repository that is intended to be portable and potentially usable by others is the **data analysis** section (`postprocessing/`).
+
 This repository contains the configuration and analysis scripts for a NEMO (Nucleus for European Modelling of the Ocean) experiment simulating tidal/Kelvin wave propagation in an idealized basin.
 
 ## Project Structure
@@ -28,13 +33,16 @@ The experiment is designed to simulate a Kelvin wave propagating in an **idealiz
 
 ### Running the Simulation
 
+> [!NOTE]
+> The simulation configuration is tailored for a specific remote cluster. The following steps are for reference and documentation purposes only and are not expected to work in a local environment.
+
 1.  Navigate to the experiment directory:
     ```bash
-    cd TIDES/EXP00
+    cd TIDES2/EXP00
     ```
 2.  (Optional) Clean and rebuild if source code in `MY_SRC` was modified:
     ```bash
-    ../makenemo -m <ARCH> -n TIDES -r NEMO_REF -d "MY_SRC"
+    ../makenemo -m <ARCH> -n TIDES2 -r NEMO_REF -d "MY_SRC"
     ```
     *Note: Adjust `<ARCH>` to your machine's architecture file.*
 3.  Run the simulation:
@@ -44,6 +52,8 @@ The experiment is designed to simulate a Kelvin wave propagating in an **idealiz
     *Or run the executable directly if no script is preferred.*
 
 ### Analysis
+
+The analysis scripts found in `postprocessing/` are independent of the cluster environment and can be run locally to visualize the results (provided you have the output data).
 
 1.  Navigate to the postprocessing directory:
     ```bash
@@ -57,4 +67,5 @@ The experiment is designed to simulate a Kelvin wave propagating in an **idealiz
 
 ## License
 
-[Specify License if applicable, e.g., MIT, Student Project]
+[University Project]
+This material is part of a university course project and is provided for educational demonstration purposes only. It is not intended for commercial use or replication in production environments.
