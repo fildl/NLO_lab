@@ -41,4 +41,6 @@ usrdef_exp/
 # Environments
 .env
 .venv
-venv/
+# Animation Files
+*.mp4
+*.gif
