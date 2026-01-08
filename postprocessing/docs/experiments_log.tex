@@ -163,38 +163,33 @@ Il sistema si comporta in modo \textbf{lineare} per perturbazioni fino a 1.0 m s
 \subsection{Analisi dei Risultati}
 
 \subsubsection{1. Effetto Shoaling (Amplificazione)}
-La teoria prevede che l'ampiezza dell'onda aumenti quando la profondità diminuisce. Per un canale a larghezza costante, la Legge di Green stabilisce che:
-$$ A \propto H^{-1/4} $$
-Confrontando la serie temporale dell'SSH all'Estremità Nord tra l'esperimento C (100m) e la Baseline (100m) in Figura \ref{fig:shoaling}, osserviamo chiaramente:
-\begin{enumerate}
-    \item \textbf{Amplificazione (Attesa vs Osservata)}:
-    Teoricamente (Legge di Green $A \propto H^{-1/4}$), l'onda dovrebbe amplificarsi di un fattore $\approx (1000/100)^{0.25} \approx 1.77$.
-    Tuttavia, osserviamo un'ampiezza minore rispetto alla Baseline. Le cause probabili sono:
-    \begin{itemize}
-        \item \textbf{Dispersione Numerica}: L'onda viaggia molto velocemente ($c \approx 100$ m/s) su una griglia spaziale invariata (~10 km). Questo riduce l'accuratezza nel preservare il picco.
-        \item \textbf{Dinamica a Grande Scala}: A 1000m di profondità, il Raggio di Rossby ($R \approx 1000$ km) è molto maggiore della larghezza del bacino. L'onda non è più una Kelvin wave confinata, ma uno "sloshing" che coinvolge tutto il bacino, disperdendo energia su un fronte più ampio rispetto al caso a 100m.
-    \end{itemize}
-    \item \textbf{Velocità di Fase (Corretta)}: L'onda arriva al Nord dopo circa 4 ore, contro le 9 ore del caso a 100m. Questo è fisicamente corretto e coerente con la maggiore velocità media in acqua profonda.
-\end{enumerate}
-
-\noindent
-Per visualizzare meglio l'evoluzione dell'ampiezza lungo tutto il percorso, abbiamo estratto il valore massimo dell'SSH lungo la costa orientale.
-La Figura \ref{fig:shoaling_profile} mostra il confronto tra l'ampiezza osservata (blu) e quella teorica prevista dalla Legge di Green (rosso).
-Si nota che l'onda parte correttamente (ampiezza $\approx 0.1$m), ma invece di crescere esponenzialmente mentre la profondità diminuisce (linea rossa), l'ampiezza osservata decade. Questo conferma che la dispersione (fisica e numerica) domina sullo shoaling in questa configurazione.
+La teoria prevede che l'ampiezza dell'onda aumenti quando la profondità diminuisce (Legge di Green $A \propto H^{-1/4}$).
+Per analizzare questo fenomeno, in Figura \ref{fig:shoaling_profile} confrontiamo l'evoluzione dell'ampiezza massima osservata lungo la costa (blu) con la curva teorica (rosso), focalizzandoci sul range 400 km - 1000 km per escludere il transiente iniziale e gli effetti di bordo a Nord.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{fig_ExpC_shoaling_profile.png}
+    \includegraphics[width=0.8\textwidth]{fig_ExpC_shoaling_profile.png}
     \caption{Profilo di Shoaling: Ampiezza massima lungo la costa vs Legge di Green teorica.}
     \label{fig:shoaling_profile}
 \end{figure}
 
+Osserviamo che:
+\begin{itemize}
+    \item Nella prima parte del dominio valido, l'ampiezza misurata sembra seguire il trend di crescita teorico.
+    \item Successivamente si nota una deviazione (forse dovuta a dispersione numerica).
+    \item Il valore finale osservato è vicino a quello teorico, sebbene, data l'evoluzione non monotona nel mezzo, questo accordo puntuale potrebbe essere una coincidenza.
+\end{itemize}
+
+Un altro effetto fondamentale della profondità variabile è sulla \textbf{Velocità di Fase}, visibile nel confronto delle serie temporali al punto Nord (Figura \ref{fig:shoaling}).
+
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1.0\textwidth]{fig_ExpC_shoaling_comparison.png}
-    \caption{Confronto SSH a Nord: Exp C (Rosso, batimetria lineare) vs Baseline (Nero, batimetria piatta). Evidente lo shoaling e lo sfasamento.}
+    \includegraphics[width=0.8\textwidth]{fig_ExpC_shoaling_comparison.png}
+    \caption{Confronto SSH a Nord. Esperimento C (Rosso) vs Baseline (Nero).}
     \label{fig:shoaling}
 \end{figure}
+
+L'onda dell'Esperimento C (che ha viaggiato su fondali profondi fino a 1000m) arriva a destinazione molto prima ($\approx 4$ ore) rispetto alla Baseline (9 ore), confermando che la relazione $c = \sqrt{gH}$ è correttamente rappresentata dal modello.
 
 \subsubsection{2. Diagramma di Hovmöller}
 Nel diagramma spazio-tempo (Figura \ref{fig:hovmollerC}) viene sovrapposta la curva teorica del tempo di arrivo $t(y)$, calcolata integrando la velocità di fase locale (dipendente dalla profondità $H(y)$):
@@ -211,8 +206,8 @@ La pendenza della traccia numerica segue la curva teorica (linea tratteggiata), 
 \subsubsection{3. Evoluzione Spaziale (Confronto A vs C)}
 Gli snapshots in Figura \ref{fig:snapshotsC} (Exp C), confrontati con quelli della Baseline (Exp A), evidenziano differenze dinamiche fondamentali:
 \begin{itemize}
-    \item \textbf{Velocità}: In Exp C l'onda viaggia molto più velocemente. A $T=5.5$h il fronte ha già percorso gran parte del bacino, mentre in Exp A è ancora nella prima metà.
-    \item \textbf{Confinamento Costiero}: In Exp A (100m) l'onda è ben confinata alla costa (Raggio di Rossby $R \approx 300$ km). In Exp C, nelle zone profonde (1000m), $R$ aumenta drasticamente ($R \approx 1000$ km), superando la larghezza del bacino. Di conseguenza, l'onda perde il carattere di Kelvin "intrappolata" e assume un comportamento più dispersivo o di oscillazione dell'intero bacino ("sloshing").
+    \item \textbf{Velocità}: In Exp C l'onda viaggia molto più velocemente.
+    \item \textbf{Confinamento Costiero}: In Exp A (100m) l'onda è confinata alla costa (Raggio di Rossby $R \approx 300$ km). In Exp C, nelle zone profonde (1000m), $R$ aumenta drasticamente ($R \approx 1000$ km), superando la larghezza del bacino. Di conseguenza, l'onda perde il carattere di Kelvin "intrappolata" e assume un comportamento più dispersivo o di oscillazione dell'intero bacino ("sloshing").
 \end{itemize}
 
 \begin{figure}[H]
@@ -224,8 +219,7 @@ Gli snapshots in Figura \ref{fig:snapshotsC} (Exp C), confrontati con quelli del
 
 \newpage
 \section{Experiment D: Resolution Sensitivity}
-\textbf{Obiettivo:} Verificare l'impatto della risoluzione spaziale sulla dissipazione numerica.
-Aumentando la risoluzione, mi aspetto che l'onda mantenga meglio la sua forma e ampiezza nel tempo, riducendo la diffusività numerica.
+\textbf{Obiettivo:} Verificare l'impatto della risoluzione spaziale sulla simulazione.
 
 \subsection{Configurazione}
 \begin{itemize}
@@ -249,6 +243,7 @@ La Figura \ref{fig:res_compare} mostra il confronto diretto dell'SSH all'Estremi
     \label{fig:res_compare}
 \end{figure}
 
+\newpage
 \subsubsection{2. Diagramma di Hovmöller}
 Il diagramma spazio-tempo per il caso ad alta risoluzione (Figura \ref{fig:hov_D}) mostra dettagli più fini nella struttura dell'onda.
 
@@ -262,13 +257,12 @@ Il diagramma spazio-tempo per il caso ad alta risoluzione (Figura \ref{fig:hov_D
 \newpage
 \section{Esperimento E: Validazione Fisica ($f=0$)}
 \subsection{Obiettivo}
-Per confermare che l'onda osservata nell'Esperimento A sia effettivamente un'onda di Kelvin costiera, abbiamo rimosso la rotazione terrestre imponendo il parametro di Coriolis $f=0$ ovunque nel dominio. Senza la forza di Coriolis, il meccanismo di intrappolamento costiero (bilancio geostrofico trasversale) viene meno.
+Per confermare che l'onda osservata nell'Esperimento A sia effettivamente un'onda di Kelvin costiera, ho rimosso la rotazione terrestre imponendo il parametro di Coriolis $f=0$. Senza la forza di Coriolis, il meccanismo di intrappolamento costiero viene meno.
 
 \subsection{Risultati}
 La Figura \ref{fig:expE_snap} mostra l'evoluzione dell'SSH. A differenza dell'Exp A, dove l'onda restava incollata alla costa destra, qui osserviamo:
 \begin{itemize}
-    \item \textbf{Propagazione Radiale}: La perturbazione si espande in tutte le direzioni come un'onda di gravità pura ("Poincaré wave" o "Gravity wave" in acqua bassa).
-    \item \textbf{Simmetria}: Non c'è preferenza per il lato destro.
+    \item \textbf{Propagazione Radiale}: La perturbazione si espande in tutte le direzioni come un'onda di gravità.
     \item \textbf{Decadimento}: L'energia si disperde nel bacino invece di canalizzarsi lungo la costa.
 \end{itemize}
 Questo conferma che il confinamento costiero osservato nella Baseline è dovuto esclusivamente alla rotazione terrestre (Onda di Kelvin).
@@ -276,7 +270,7 @@ Questo conferma che il confinamento costiero osservato nella Baseline è dovuto 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\textwidth]{fig_ExpE_snapshots.png}
-    \caption{Snapshots Exp E ($f=0$). L'onda si propaga radialmente e simmetricamente, confermando che il confinamento costiero (Exp A) è dovuto alla rotazione.}
+    \caption{Snapshots Exp E ($f=0$).}
     \label{fig:expE_snap}
 \end{figure}
 
