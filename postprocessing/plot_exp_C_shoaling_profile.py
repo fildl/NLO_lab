@@ -7,15 +7,18 @@ import os
 # Settings
 script_dir = os.path.dirname(os.path.abspath(__file__))
 work_dir = os.path.join(script_dir, 'experiments')
-filename = 'EXP_C_slope_100.nc'
-filepath = os.path.join(work_dir, filename)
 
-def plot_shoaling_profile():
+
+def plot_shoaling_profile(config):
+    filename = config['filename']
+    filepath = os.path.join(work_dir, filename)
+    suffix = config['suffix']
+
     if not os.path.exists(filepath):
         print(f"Error: Data file not found at {filepath}")
         return
 
-    print(f"Analyzing Shoaling Profile for Experiment C: {filename}")
+    print(f"Analyzing Shoaling Profile for Experiment C: {filename} (Suffix: '{suffix}')")
     ds = netCDF4.Dataset(filepath)
     ssh = ds.variables['sossheig'][:]
     
@@ -49,7 +52,6 @@ def plot_shoaling_profile():
         # We generally care about the max elevation.
         amp_observed[j] = np.max(ts)
         
-        amp_observed[j] = np.max(ts)
     
     # Define Depth Profile H(y) for the whole domain first
     h_start = 1000.0
@@ -97,19 +99,27 @@ def plot_shoaling_profile():
     ax2.invert_yaxis() # Depth downwards
     
     # Highlight Start and End
-    plt.title('Experiment C: Shoaling Effect Analysis\nAmplitude Evolution vs Depth')
+    plt.title(f'Experiment C ({filename}): Shoaling Effect Analysis\nAmplitude Evolution vs Depth')
     
     # Combine legends
     lines1, labels1 = ax1.get_legend_handles_labels()
     lines2, labels2 = ax2.get_legend_handles_labels()
     ax1.legend(lines1 + lines2, labels1 + labels2, loc='upper center')
     
-    save_path = os.path.join(script_dir, 'fig_ExpC_shoaling_profile.png')
+    save_path = os.path.join(script_dir, f'fig_ExpC_shoaling_profile{suffix}.png')
     plt.savefig(save_path, dpi=300)
-    plt.show()
+    #plt.show()
     print(f"Saved Shoaling Profile to {save_path}")
     
     ds.close()
 
 if __name__ == "__main__":
-    plot_shoaling_profile()
+    # Definition of configurations to process
+    configurations = [
+        {'filename': 'EXP_C_slope_100.nc', 'suffix': ''},
+        {'filename': 'EXP_C_slope_100_1core.nc', 'suffix': '_1core'}
+    ]
+
+    for config in configurations:
+        plot_shoaling_profile(config)
+

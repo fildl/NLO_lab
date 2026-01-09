@@ -6,33 +6,30 @@ import os
 # Settings
 script_dir = os.path.dirname(os.path.abspath(__file__))
 work_dir = os.path.join(script_dir, 'experiments')
-filename = 'EXP_C_slope_100.nc'
-filepath = os.path.join(work_dir, filename)
 
-# Mesh mask path candidates
-meshpath_candidates = [
-    os.path.join(script_dir, 'mesh', 'mesh_mask_C.nc'),
-    os.path.join(work_dir, 'mesh_mask_C.nc'),
-    os.path.join(script_dir, 'experiments', 'mesh_mask.nc') # Fallback to generic
-]
-meshpath = ""
-for p in meshpath_candidates:
-    if os.path.exists(p):
-        meshpath = p
-        break
 
-def analyze_exp_c():
+def analyze_dataset(config):
+    filename = config['filename']
+    filepath = os.path.join(work_dir, filename)
+    suffix = config['suffix']
+    
     if not os.path.exists(filepath):
-        print(f"Error: Data file not found at {filepath}")
+        print(f"Skipping {filename}: File not found at {filepath}")
         return
 
-    print(f"Analyzing Experiment C: {filename}")
+    print(f"Analyzing Experiment C: {filename} (Suffix: '{suffix}')")
     ds = netCDF4.Dataset(filepath)
     ssh = ds.variables['sossheig'][:]
     
     # --- Robust Mask Loading ---
     tmask = None
-    if os.path.exists(meshpath):
+    meshpath = ""
+    for p in config['mesh_candidates']:
+        if os.path.exists(p):
+            meshpath = p
+            break
+            
+    if meshpath and os.path.exists(meshpath):
         try:
             mds = netCDF4.Dataset(meshpath)
             # Check if tmask exists
@@ -91,9 +88,9 @@ def analyze_exp_c():
     plt.colorbar(label='SSH (mm)')
     plt.xlabel('Distance South-North (km approx)')
     plt.ylabel('Time (hours)')
-    plt.title('Exp C: Hovmöller Diagram (Shoaling Check - 100m Slope)')
-    plt.savefig(os.path.join(script_dir, 'fig_ExpC_hovmoller.png'), dpi=300)
-    print("Saved fig_ExpC_hovmoller.png")
+    plt.title(f'Exp C ({filename}): Hovmöller Diagram')
+    plt.savefig(os.path.join(script_dir, f'fig_ExpC_hovmoller{suffix}.png'), dpi=300)
+    print(f"Saved fig_ExpC_hovmoller{suffix}.png")
 
     # --- 2. Snapshots ---
     print("Generating Snapshots...")
@@ -111,7 +108,6 @@ def analyze_exp_c():
     selected_ssh = ssh[steps, :, :]
     scale_mm = 1000.0
     vmax_local = 0.4 # Fixed scale
-    print(f"Exp C Vmax (mm): {vmax_local}")
     
     # Larger fonts
     plt.rcParams.update({'font.size': 14, 'axes.titlesize': 16, 'axes.labelsize': 14})
@@ -143,12 +139,12 @@ def analyze_exp_c():
         if i > 0: ax.set_yticklabels([])
 
     # Match Exp A title position
-    fig.suptitle('Exp C: Kelvin Wave Propagation', fontsize=20, y=1.06)
+    fig.suptitle(f'Exp C ({filename}): Kelvin Wave Propagation', fontsize=20, y=1.06)
     if 'im' in locals():
         # Match Exp A colorbar padding
         fig.colorbar(im, ax=axes, orientation='horizontal', fraction=0.05, pad=0.03, label='SSH (mm)')
-    plt.savefig(os.path.join(script_dir, 'fig_ExpC_snapshots.png'), dpi=300, bbox_inches='tight')
-    print("Saved fig_ExpC_snapshots.png")
+    plt.savefig(os.path.join(script_dir, f'fig_ExpC_snapshots{suffix}.png'), dpi=300, bbox_inches='tight')
+    print(f"Saved fig_ExpC_snapshots{suffix}.png")
 
     ds.close()
 
@@ -174,15 +170,15 @@ def analyze_exp_c():
         time_a = np.arange(len(ts_a)) * dt_a / 3600
         
         scale_mm = 1000.0
-        plt.plot(time_c, ts_c * scale_mm, 'r-', label='Exp C (Slope: 100m)', linewidth=2)
+        plt.plot(time_c, ts_c * scale_mm, 'r-', label=f'Exp C {suffix} (Slope: 100m)', linewidth=2)
         plt.plot(time_a, ts_a * scale_mm, 'k--', label='Baseline (Flat: 100m)', linewidth=1.5)
-        plt.title('Shoaling Effect: SSH at Northern Coast')
+        plt.title(f'Shoaling Effect: SSH at Northern Coast ({filename})')
         plt.xlabel('Time (hours)')
         plt.ylabel('SSH (mm)')
         plt.legend()
         plt.grid()
-        plt.savefig(os.path.join(script_dir, 'fig_ExpC_shoaling_comparison.png'), dpi=300)
-        print("Saved fig_ExpC_shoaling_comparison.png")
+        plt.savefig(os.path.join(script_dir, f'fig_ExpC_shoaling_comparison{suffix}.png'), dpi=300)
+        print(f"Saved fig_ExpC_shoaling_comparison{suffix}.png")
     else:
         print(f"Baseline file {baseline_file} not found. Skipping shoaling comparison.")
 
@@ -199,7 +195,7 @@ def analyze_exp_c():
         cmap = 'viridis_r'
         im = ax_2d.pcolormesh(lon, lat, depth_grid, cmap=cmap, shading='auto')
         
-        ax_2d.set_title('Experiment C Bathymetry (2D)', fontsize=14)
+        ax_2d.set_title(f'Experiment C Bathymetry (2D) {suffix}', fontsize=14)
         ax_2d.set_xlabel('Longitude (°E)')
         ax_2d.set_ylabel('Latitude (°N)')
         ax_2d.set_aspect('equal')
@@ -220,17 +216,15 @@ def analyze_exp_c():
         ax_2d.plot(path_lons, path_lats, 'r-', linewidth=2, label='Hovmöller Path')
         ax_2d.legend(loc='upper right')
         
-        plt.savefig(os.path.join(script_dir, 'fig_ExpC_bathymetry_2D.png'), dpi=300, bbox_inches='tight')
-        print("Saved fig_ExpC_bathymetry_2D.png")
+        plt.savefig(os.path.join(script_dir, f'fig_ExpC_bathymetry_2D{suffix}.png'), dpi=300, bbox_inches='tight')
+        print(f"Saved fig_ExpC_bathymetry_2D{suffix}.png")
 
     # --- 4b. Bathymetry Map (3D Surface) ---
     print("Generating 3D Bathymetry Map from Mesh Mask...")
     
-    mesh_mask_file = os.path.join(script_dir, 'mesh', 'mesh_mask_C.nc')
-    
-    if os.path.exists(mesh_mask_file):
+    if meshpath and os.path.exists(meshpath):
         try:
-            ds_mesh = netCDF4.Dataset(mesh_mask_file)
+            ds_mesh = netCDF4.Dataset(meshpath)
             gdepw = ds_mesh.variables['gdepw_0'][0, :, :, :] 
             mbathy = ds_mesh.variables['mbathy'][0, :, :]
             ny, nx = mbathy.shape
@@ -274,7 +268,7 @@ def analyze_exp_c():
             
             ax.plot(path_lons, path_lats, path_z, 'r-', linewidth=3, label='Hovmöller Path', zorder=10)
             
-            ax.set_title('Experiment C Bathymetry (3D Reconstruction)', fontsize=16)
+            ax.set_title(f'Experiment C Bathymetry (3D) {suffix}', fontsize=16)
             ax.set_xlabel('Longitude (°E)')
             ax.set_ylabel('Latitude (°N)')
             ax.set_zlabel('Depth (m)')
@@ -286,13 +280,13 @@ def analyze_exp_c():
             
             ax.view_init(elev=30, azim=225)
             
-            plt.savefig(os.path.join(script_dir, 'fig_ExpC_bathymetry_3D.png'), dpi=300, bbox_inches='tight')
-            print("Saved fig_ExpC_bathymetry_3D.png")
+            plt.savefig(os.path.join(script_dir, f'fig_ExpC_bathymetry_3D{suffix}.png'), dpi=300, bbox_inches='tight')
+            print(f"Saved fig_ExpC_bathymetry_3D{suffix}.png")
             
         except Exception as e:
             print(f"Error plotting 3D bathymetry: {e}")
     else:
-        print(f"Mesh mask not found at {mesh_mask_file}. Skipping 3D Bathymetry.")
+        print(f"Mesh mask not found at {meshpath}. Skipping 3D Bathymetry.")
 
     # --- 5. Hovmöller Comparison (A vs C) ---
     print("Generating Hovmöller Comparison (Exp A vs C)...")
@@ -343,7 +337,7 @@ def analyze_exp_c():
         # Using symmetric vmin/vmax
         im2 = ax.imshow(hov_C * 1000, aspect='auto', origin='lower', cmap='RdBu_r', vmin=-vmax_c, vmax=vmax_c,
                        extent=[0, hov_C.shape[1]*10, 0, hov_C.shape[0]*dt_c/3600])
-        ax.set_title('Exp C: Sloping Bottom (1000m -> 100m)\nDecelerating -> Curved Line')
+        ax.set_title(f'Exp C ({suffix}): Sloping Bottom\nDecelerating -> Curved Line')
         ax.set_xlabel('Distance South-North (km approx)')
         ax.set_yticklabels([])
         
@@ -364,10 +358,35 @@ def analyze_exp_c():
         
         fig.colorbar(im, ax=axes, orientation='horizontal', fraction=0.05, pad=0.02, label='SSH (mm)')
         
-        plt.savefig(os.path.join(script_dir, 'fig_ExpC_hovmoller_comparison.png'), dpi=300)
-        print("Saved fig_ExpC_hovmoller_comparison.png")
+        plt.savefig(os.path.join(script_dir, f'fig_ExpC_hovmoller_comparison{suffix}.png'), dpi=300)
+        print(f"Saved fig_ExpC_hovmoller_comparison{suffix}.png")
     else:
         print("Baseline file needed for Hovmöller Comparison not found.")
 
-if __name__ == "__main__":
+def main():
     analyze_exp_c()
+
+if __name__ == "__main__":
+    # Definition of configurations to process
+    configurations = [
+        {
+            'filename': 'EXP_C_slope_100.nc',
+            'mesh_candidates': [
+                os.path.join(script_dir, 'mesh', 'mesh_mask_C.nc'),
+                os.path.join(work_dir, 'mesh_mask_C.nc'),
+                os.path.join(script_dir, 'experiments', 'mesh_mask.nc')
+            ],
+            'suffix': ''
+        },
+        {
+            'filename': 'EXP_C_slope_100_1core.nc',
+            'mesh_candidates': [
+                os.path.join(script_dir, 'mesh', 'mesh_mask_C_1core.nc'),
+                os.path.join(work_dir, 'mesh_mask_C_1core.nc')
+            ],
+            'suffix': '_1core'
+        }
+    ]
+
+    for config in configurations:
+        analyze_dataset(config)
