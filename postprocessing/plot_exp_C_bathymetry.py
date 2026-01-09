@@ -268,7 +268,7 @@ def analyze_dataset(config):
             
             ax.plot(path_lons, path_lats, path_z, 'r-', linewidth=3, label='Hovmöller Path', zorder=10)
             
-            ax.set_title(f'Experiment C Bathymetry (3D) {suffix}', fontsize=16)
+            ax.set_title(f'Experiment C Bathymetry', fontsize=16)
             ax.set_xlabel('Longitude (°E)')
             ax.set_ylabel('Latitude (°N)')
             ax.set_zlabel('Depth (m)')

@@ -191,22 +191,32 @@
 % Slide 7: Exp B - Verifica della Linearità
 % -----------------------------------------------------------------------------
 \begin{frame}{Exp B: Sensibilità all'Ampiezza}
-    \textbf{Domanda:} Il modello risponde linearmente aumentando l'ampiezza iniziale?
+    Il modello risponde linearmente aumentando l'ampiezza iniziale?
     \begin{itemize}
         \item Tre simulazioni: $A_0 = 0.1$ m, $0.5$ m, $1.0$ m.
     \end{itemize}
 
-    \begin{figure}
-        \centering
-        \includegraphics[width=0.65\textwidth]{../postprocessing/fig_expB_compare_linearity.png}
-    \end{figure}
+    \begin{columns}
+        \begin{column}{0.4\textwidth}
+            \begin{figure}
+                \centering
+                \includegraphics[height=0.45\textheight,keepaspectratio]{../postprocessing/fig_expB_location.png}
+            \end{figure}
+        \end{column}
+        \begin{column}{0.6\textwidth}
+            \begin{figure}
+                \centering
+                \includegraphics[height=0.45\textheight,keepaspectratio]{../postprocessing/fig_expB_compare_linearity.png}
+            \end{figure}
+        \end{column}
+    \end{columns}
 \end{frame}
 
 % -----------------------------------------------------------------------------
 % Slide 7: Exp C - Batimetria Variabile
 % -----------------------------------------------------------------------------
 \begin{frame}{Exp C: Effetto della Batimetria}
-    Introduzione di una pendenza "tipo Adriatico": $H(y)$ da 1000m (Sud) a 100m (Nord).
+    Introduzione di una pendenza "tipo Adriatico":\\ $H(y)$ da 1000m (Sud) a 100m (Nord).
     
     \begin{columns}
         \begin{column}{0.5\textwidth}
@@ -232,7 +242,8 @@
 
     \begin{figure}
         \centering
-        \includegraphics[width=0.75\textwidth]{../postprocessing/fig_ExpC_shoaling_comparison_1core.png}
+        \only<1>{\includegraphics[width=0.75\textwidth]{../postprocessing/fig_ExpC_shoaling_comparison_1core.png}}%
+        \only<2>{\includegraphics[width=0.9\textwidth]{../postprocessing/fig_ExpC_hovmoller_comparison_1core.png}}
     \end{figure}
 \end{frame}
 
