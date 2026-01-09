@@ -23,6 +23,8 @@
 Questo documento raccoglie i risultati delle prove di sensibilità effettuate sul modello NEMO per il caso TIDES (propagazione Onda di Kelvin in Adriatico idealizzato).
 L'obiettivo è analizzare la risposta del modello variando parametri come l'ampiezza della perturbazione iniziale.
 
+\textbf{Nota sulle Visualizzazioni:} Per facilitare il confronto diretto tra i diversi esperimenti, tutte le mappe di SSH e i diagrammi di Hovmöller presentati in questo report utilizzano la stessa scala di colore con range $[-0.4 \text{ mm}, +0.4 \text{ mm}]$.
+
 \section{Experiment A: Baseline (Riferimento)}
 \textbf{Obiettivo:} Stabilire una simulazione stabile.
 \subsection{Configurazione}
@@ -169,10 +171,29 @@ Il sistema si comporta in modo \textbf{lineare} per perturbazioni fino a 1.0 m s
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.3\textwidth]{fig_ExpC_bathymetry_3D.png}
-    \caption{Batimetria Esperimento C: Pendenza lineare lungo $y$.}
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{fig_ExpC_bathymetry_2D.png}
+        \caption{Mappa 2D con percorso Hovmöller.}
+        \label{fig:bathyC_2D}
+    \end{minipage}\hfill
+    \begin{minipage}{0.5\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{fig_ExpC_bathymetry_3D.png}
+        \caption{Ricostruzione 3D (Z-coord steps).}
+        \label{fig:bathyC_3D}
+    \end{minipage}
+    \caption{Batimetria Esperimento C: Pendenza lineare lungo $y$. La visualizzazione 3D mostra la discretizzazione a "gradini" tipica delle cordinate Z (full steps) usate nel modello.}
     \label{fig:bathyC}
 \end{figure}
+
+\subsection{Analisi della Discretizzazione Verticale}
+La batimetria a "gradini" osservata in Figura \ref{fig:bathyC_3D} è intrinseca alla scelta delle \textbf{Coordinate Z (Full Steps)} ($\texttt{ln\_zco = .true.}$), dove la profondità del fondo scatta al livello verticale discreto più vicino.
+Per ottenere una rappresentazione più fedele (liscia) della topografia in futuri esperimenti, si potrebbero considerare:
+\begin{itemize}
+    \item \textbf{Partial Steps} ($\texttt{ln\_zps = .true.}$): Mantiene le coordinate Z ma adatta lo spessore dell'ultima cella di fondo. È lo standard per minimizzare gli errori di gradiente di pressione.
+    \item \textbf{Sigma Coordinates} ($\texttt{ln\_sco = .true.}$): I livelli seguono il terreno (terrain-following). Sarebbe un utile confronto per valutare come la risoluzione esatta della pendenza influenzi la propagazione dell'onda, anche se potenzialmente soggetta a errori di gradiente di pressione più elevati ("Printzelberger errors") su pendii ripidi come questo.
+\end{itemize}
 
 \subsection{Analisi dei Risultati}
 

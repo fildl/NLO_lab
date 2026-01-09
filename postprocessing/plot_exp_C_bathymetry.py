@@ -82,9 +82,8 @@ def analyze_exp_c():
 
     plt.figure(figsize=(10, 8))
     scale_mm = 1000.0
-    h_vmax = np.percentile(np.abs(hovmoller), 99) * scale_mm
-    print(f"Hovmoller Vmax (mm): {h_vmax}")
-    if h_vmax == 0: h_vmax = 1.0
+    scale_mm = 1000.0
+    h_vmax = 0.4 # Fixed scale
 
     plt.imshow(hovmoller * scale_mm, aspect='auto', origin='lower', cmap='RdBu_r', 
                vmin=-h_vmax, vmax=h_vmax,
@@ -111,7 +110,7 @@ def analyze_exp_c():
     
     selected_ssh = ssh[steps, :, :]
     scale_mm = 1000.0
-    vmax_local = np.percentile(np.abs(selected_ssh), 99.9) * scale_mm
+    vmax_local = 0.4 # Fixed scale
     print(f"Exp C Vmax (mm): {vmax_local}")
     
     # Larger fonts
@@ -187,52 +186,113 @@ def analyze_exp_c():
     else:
         print(f"Baseline file {baseline_file} not found. Skipping shoaling comparison.")
 
-    # --- 4. Bathymetry Map (2D) ---
-    print("Generating Bathymetry Map...")
+    # --- 4a. Bathymetry Map (2D) ---
+    print("Generating 2D Bathymetry Map...")
     if lon is not None:
-        fig, ax = plt.subplots(figsize=(8, 10), constrained_layout=True)
+        fig_2d, ax_2d = plt.subplots(figsize=(8, 10), constrained_layout=True)
         
-        # Reconstruct Depth (Analytical: 1000m South -> 100m North)
+        # Use simple reconstruction for 2D map (or mesh mask)
         ny, nx = lat.shape
         depth_profile = np.linspace(1000, 100, ny)
         depth_grid = np.tile(depth_profile[:, np.newaxis], (1, nx))
         
-        # Plot 2D Map
-        # User requested "another colormap" (was terrain). 'viridis' is good for depth.
-        cmap = 'viridis_r' # Reversed so deep (1000) is Purple/Dark, shallow (100) is Yellow/Light
-        im = ax.pcolormesh(lon, lat, depth_grid, cmap=cmap, shading='auto')
+        cmap = 'viridis_r'
+        im = ax_2d.pcolormesh(lon, lat, depth_grid, cmap=cmap, shading='auto')
         
-        ax.set_title('Experiment C Bathymetry', fontsize=14)
-        ax.set_xlabel('Longitude (°E)')
-        ax.set_ylabel('Latitude (°N)')
-        ax.set_aspect('equal')
+        ax_2d.set_title('Experiment C Bathymetry (2D)', fontsize=14)
+        ax_2d.set_xlabel('Longitude (°E)')
+        ax_2d.set_ylabel('Latitude (°N)')
+        ax_2d.set_aspect('equal')
         
-        # Colorbar with Min/Max
+        cbar = fig_2d.colorbar(im, ax=ax_2d, label='Depth (m)')
         dmin, dmax = np.min(depth_grid), np.max(depth_grid)
-        cbar = fig.colorbar(im, ax=ax, label='Depth (m)')
         cbar.set_ticks([dmin, 250, 500, 750, dmax])
-        cbar.set_ticklabels([f'{int(dmin)}m', '250', '500', '750', f'{int(dmax)}m'])
         
-        # Annotation removed as per user request
-        
-        # --- Overlay Extraction Path ---
-        # Convert grid indices to Lon/Lat coordinates
+        # Overlay Path
         path_lons = []
         path_lats = []
         for j in range(ny):
             i_idx = east_coast_idx[j]
-            # Ensure index within bounds
             if i_idx >= nx: i_idx = nx - 1
             path_lons.append(lon[j, int(i_idx)])
             path_lats.append(lat[j, int(i_idx)])
             
-        ax.plot(path_lons, path_lats, 'r-', linewidth=2, label='Hovmöller Path')
-        ax.legend(loc='upper right')
+        ax_2d.plot(path_lons, path_lats, 'r-', linewidth=2, label='Hovmöller Path')
+        ax_2d.legend(loc='upper right')
         
-        plt.savefig(os.path.join(script_dir, 'fig_ExpC_bathymetry_3D.png'), dpi=300, bbox_inches='tight') # Keep filename as requested by user flow implies replacing
-        print("Saved fig_ExpC_bathymetry_3D.png (2D Map version with path)")
+        plt.savefig(os.path.join(script_dir, 'fig_ExpC_bathymetry_2D.png'), dpi=300, bbox_inches='tight')
+        print("Saved fig_ExpC_bathymetry_2D.png")
+
+    # --- 4b. Bathymetry Map (3D Surface) ---
+    print("Generating 3D Bathymetry Map from Mesh Mask...")
+    
+    mesh_mask_file = os.path.join(script_dir, 'mesh', 'mesh_mask_C.nc')
+    
+    if os.path.exists(mesh_mask_file):
+        try:
+            ds_mesh = netCDF4.Dataset(mesh_mask_file)
+            gdepw = ds_mesh.variables['gdepw_0'][0, :, :, :] 
+            mbathy = ds_mesh.variables['mbathy'][0, :, :]
+            ny, nx = mbathy.shape
+            bathy_2d = np.zeros((ny, nx))
+            
+            for j in range(ny):
+                for i in range(nx):
+                    level = mbathy[j, i]
+                    if level > 0:
+                        bathy_2d[j, i] = gdepw[int(level), j, i]
+                    else:
+                        bathy_2d[j, i] = 0.0
+            ds_mesh.close()
+            
+            from mpl_toolkits.mplot3d import Axes3D
+            from matplotlib import cm
+            
+            fig = plt.figure(figsize=(10, 8), constrained_layout=True)
+            ax = fig.add_subplot(111, projection='3d')
+            
+            if lon is not None:
+                X, Y = lon, lat
+            else:
+                X, Y = np.meshgrid(np.arange(nx), np.arange(ny))
+            
+            Z = -bathy_2d 
+            
+            # Plot Surface
+            surf = ax.plot_surface(X, Y, Z, cmap='viridis', linewidth=0, antialiased=False, alpha=0.9)
+            
+            # Add Red Path Line in 3D
+            # Need (x, y, z) for the line. 
+            # We have path_lons (x) and path_lats (y). Need to lookup depth (z) at those indices.
+            path_z = []
+            for j in range(ny):
+                i_idx = int(east_coast_idx[j])
+                if i_idx >= nx: i_idx = nx - 1
+                # Find depth at this point
+                d_val = bathy_2d[j, i_idx]
+                path_z.append(-d_val + 10) # Lift slightly so it is visible above surface
+            
+            ax.plot(path_lons, path_lats, path_z, 'r-', linewidth=3, label='Hovmöller Path', zorder=10)
+            
+            ax.set_title('Experiment C Bathymetry (3D Reconstruction)', fontsize=16)
+            ax.set_xlabel('Longitude (°E)')
+            ax.set_ylabel('Latitude (°N)')
+            ax.set_zlabel('Depth (m)')
+            ax.legend()
+            
+            m = cm.ScalarMappable(cmap='viridis')
+            m.set_array(bathy_2d)
+            fig.colorbar(m, ax=ax, shrink=0.6, label='Depth (m)')
+            
+            ax.view_init(elev=30, azim=225)
+            
+            plt.savefig(os.path.join(script_dir, 'fig_ExpC_bathymetry_3D.png'), dpi=300, bbox_inches='tight')
+            print("Saved fig_ExpC_bathymetry_3D.png")
+            
+        except Exception as e:
+            print(f"Error plotting 3D bathymetry: {e}")
     else:
-        print("Cannot plot Bathymetry without Longitude/Latitude data.")
+        print(f"Mesh mask not found at {mesh_mask_file}. Skipping 3D Bathymetry.")
 
     # --- 5. Hovmöller Comparison (A vs C) ---
     print("Generating Hovmöller Comparison (Exp A vs C)...")
@@ -261,8 +321,7 @@ def analyze_exp_c():
         fig, axes = plt.subplots(1, 2, figsize=(14, 8), constrained_layout=True)
         
         # Common scaling
-        vmax = np.percentile(np.abs(hov_A), 99) * 1000
-        if vmax == 0: vmax = 1.0
+        vmax = 0.4 # Fixed scale
         print(f"Comparison Vmax (mm): {vmax}")
     
         # 1. Exp A
@@ -280,7 +339,7 @@ def analyze_exp_c():
     
         # 2. Exp C
         ax = axes[1]
-        vmax_c = np.percentile(np.abs(hov_C), 99) * 1000
+        vmax_c = 0.4 # Fixed scale
         # Using symmetric vmin/vmax
         im2 = ax.imshow(hov_C * 1000, aspect='auto', origin='lower', cmap='RdBu_r', vmin=-vmax_c, vmax=vmax_c,
                        extent=[0, hov_C.shape[1]*10, 0, hov_C.shape[0]*dt_c/3600])

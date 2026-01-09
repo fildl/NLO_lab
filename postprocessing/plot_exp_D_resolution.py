@@ -116,9 +116,8 @@ def analyze_resolution():
     
     plt.figure(figsize=(10, 8))
     scale_mm = 1000.0
-    vmax = np.percentile(np.abs(hov_D), 99) * scale_mm
+    vmax = 0.4 # Fixed scale
     print(f"Exp D Vmax (mm): {vmax}")
-    if vmax==0: vmax=1.0
     
     # dt=20s
     extent = [0, ny_D, 0, hov_D.shape[0]*20.0/3600.0] 

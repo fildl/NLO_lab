@@ -79,8 +79,7 @@ y_time = np.arange(time_steps) * 60 / 3600
 # Space axis in indices (approx km)
 x_space = np.arange(ny)
 
-h_vmax = np.percentile(np.abs(hovmoller), 99) * scale_mm
-if h_vmax == 0: h_vmax = 0.4
+h_vmax = 0.4 # Fixed scale
 
 im2 = ax2.imshow(hovmoller * scale_mm, aspect='auto', origin='lower', cmap='RdBu_r',
                  extent=[0, ny, 0, y_time[-1]], vmin=-h_vmax, vmax=h_vmax)

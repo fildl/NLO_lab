@@ -104,9 +104,8 @@ def analyze_wave():
     # Convert to mm
     hovmoller_mm = hovmoller * 1000
     
-    # Use robust vmin/vmax for visibility
-    h_vmax = np.percentile(np.abs(hovmoller_mm), 99)
-    if h_vmax == 0: h_vmax = 0.05
+    # Use fixed scale for consistency
+    h_vmax = 0.4
     
     plt.imshow(hovmoller_mm, aspect='auto', origin='lower', cmap='RdBu_r', 
                vmin=-h_vmax, vmax=h_vmax,
@@ -131,8 +130,8 @@ def analyze_wave():
     # Convert to mm for plotting
     selected_ssh_mm = selected_ssh * 1000
     
-    vmax_local = np.percentile(np.abs(selected_ssh_mm), 99.9) # Use 99.9 to avoid single pixel spikes
-    print(f"Index-based Vmax (mm): {vmax_local}")
+    vmax_local = 0.4 # Fixed scale
+    print(f"Using Fixed Vmax (mm): {vmax_local}")
     
     # Larger fonts
     plt.rcParams.update({'font.size': 14, 'axes.titlesize': 16, 'axes.labelsize': 14})
