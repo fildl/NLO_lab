@@ -33,7 +33,7 @@
 \title[TIDES]{TIDES: Dinamica dell'Onda di Kelvin \\ in un Adriatico Idealizzato}
 \subtitle{Analisi di sensibilità con modello NEMO}
 \author{Filippo Di Ludovico}
-\institute{Università di Bologna \\ Numerical Laboratory of Atmosphere and Ocean}
+\institute[Università di Bologna]{Università di Bologna \\ Numerical Laboratory of Atmosphere and Ocean}
 \date{\today}
 
 \begin{document}
@@ -152,19 +152,30 @@
 % -----------------------------------------------------------------------------
 % Slide 6: Exp A - Struttura dell'Onda (Varianza)
 % -----------------------------------------------------------------------------
-\begin{frame}{Exp A: Punto Anfidromico}
+\begin{frame}{Exp A: Punto Anfidromico e Confronto}
     \begin{columns}
         \begin{column}{0.4\textwidth}
-            La mappa della varianza temporale dell'SSH identifica le zone di massima escursione (antinodi) e di minima (nodi).
+            \textbf{Risultato:}
+            Un punto anfidromico centrale (minimo di varianza, blu).
+            
+            \vspace{0.3cm}
+            \textbf{Letteratura (M2 Adriatico):}
+            La marea lunare semidiurna (M2) mostra la stessa struttura rotatoria con un nodo centrale.
+            
+            \vspace{0.3cm}
+            \textit{Il modello idealizzato cattura la fisica del bacino.}
         \end{column}
         \begin{column}{0.6\textwidth}
             \begin{figure}
                 \centering
-                \only<1>{\includegraphics[width=\linewidth,height=0.85\textheight,keepaspectratio]{../postprocessing/fig_expA_ssh_variance.png}}%
-                \only<2>{\includegraphics[width=\linewidth,height=0.85\textheight,keepaspectratio]{../postprocessing/fig_expA_ssh_variance_contour.png}}
+                \includegraphics[width=0.45\linewidth,height=0.7\textheight,keepaspectratio]{../postprocessing/fig_expA_ssh_variance_contour.png}
+                \hfill
+                \includegraphics[width=0.45\linewidth,height=0.7\textheight,keepaspectratio]{../postprocessing/fig_adriatic_tides_literature.png}
             \end{figure}
         \end{column}
     \end{columns}
+    \vfill
+    \tiny \textit{Ref: Cushman-Roisin et al., 2001}
 \end{frame}
 
 % -----------------------------------------------------------------------------
