@@ -22,7 +22,7 @@ nav_lat = ds.variables['nav_lat'][:]
 time_steps = ssh.shape[0]
 print(f"Data shape: {ssh.shape}, Timesteps: {time_steps}")
 
-fig, ax = plt.subplots(figsize=(6, 8), constrained_layout=True)
+fig, ax = plt.subplots(figsize=(5, 8), constrained_layout=True)
 fig.suptitle('SSH Evolution\nEXP A (Baseline)', fontsize=16)
 
 vmax = 0.4

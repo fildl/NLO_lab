@@ -5,8 +5,8 @@ import numpy as np
 import os
 
 # Configuration
-input_file = 'experiments/EXP_C_slope_100.nc'
-output_file = 'ssh_animation_expC.gif'
+input_file = 'experiments/EXP_E.nc'
+output_file = 'ssh_animation_expE.gif'
 fps = 15  # Frames per second
 
 # Get absolute paths
@@ -22,24 +22,12 @@ nav_lat = ds.variables['nav_lat'][:]
 time_steps = ssh.shape[0]
 print(f"Data shape: {ssh.shape}, Timesteps: {time_steps}")
 
-# For Exp C, dt = 20s. We need to check frame skipping.
-# Exp A had dt=60s and we skipped 10 frames (10 mins).
-# To have 10 mins per frame in Exp C (20s), we need step = 30.
-# 30 * 20s = 600s = 10 mins.
-
 fig, ax = plt.subplots(figsize=(5, 8), constrained_layout=True)
-fig.suptitle('SSH Evolution\nEXP C (Slope 1000m->100m)', fontsize=16)
+fig.suptitle('SSH Evolution\nEXP E (No Rotation f=0)', fontsize=16)
 
-# Scale adjustment: Previous plot_exp_C_bathymetry showed Vmax around 0.54 mm.
-# But shoaling might produce higher transient peaks.
-# User used 0.8 mm for Exp A.
-# Let's use 0.8 mm for Exp C too for direct comparability, or slightly higher if needed.
-# Given Vmax ~ 0.54 mm from snapshots, 0.8 mm is safe and comparable.
+# Scale: Exp E is validation, should use same scale as Exp A for comparison.
 vmax = 0.4
 vmin = -vmax
-
-# Use a mask if available, but for simplicity/robustness just plot all.
-# Ideally we should mask the land like in snapshots, but pcolormesh handles it ok usually.
 
 im = ax.pcolormesh(nav_lon, nav_lat, ssh[0, :, :], cmap='RdBu_r', 
                        vmin=vmin, vmax=vmax, shading='auto')
@@ -53,20 +41,17 @@ time_text = ax.text(0.5, 1.02, '', transform=ax.transAxes, ha='center', fontsize
 def update(frame):
     im.set_array(ssh[frame, :, :].ravel())
     
-    # 20s timestep for Exp C
-    hours = frame * 20 / 3600
+    # 60s timestep for Exp E
+    hours = frame * 60 / 3600
     time_text.set_text(f"Time: {hours:.2f} h")
     
-    if frame % 300 == 0:
+    if frame % 100 == 0:
         print(f"Processing frame {frame}/{time_steps}")
     return im, time_text
 
 print("Generating animation...")
-step = 30 # 10 minutes per frame (30 * 20s)
-# Limit to similar duration (17h like Exp A)
-# 17 * 3600 = 61200 s. 
-# Total steps for 17h: 61200 / 20 = 3060 steps.
-end_step = 3060
+step = 10 # 10 minutes per frame (10 * 60s)
+end_step = 1020 # 17 hours
 frames = list(range(0, min(end_step + 1, time_steps), step))
 
 ani = animation.FuncAnimation(fig, update, frames=frames, blit=False, interval=50)

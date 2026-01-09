@@ -27,7 +27,7 @@ print(f"Data shape: {ssh.shape}, Timesteps: {time_steps}")
 # To have 10 mins per frame in Exp D (20s), we need step = 30.
 # 30 * 20s = 600s = 10 mins.
 
-fig, ax = plt.subplots(figsize=(6, 8), constrained_layout=True)
+fig, ax = plt.subplots(figsize=(5, 8), constrained_layout=True)
 fig.suptitle('SSH Evolution\nEXP D (High Res)', fontsize=16)
 
 # Scale: Exp D is flat bottom like Exp A.

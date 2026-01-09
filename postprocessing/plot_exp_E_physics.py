@@ -20,18 +20,22 @@ print(f"Data shape: {ssh.shape}, Timesteps: {time_steps}")
 
 # Same timestamps as Exp A (2.0h, 5.5h, 9.0h, 12.5h, 16.0h)
 # 60s timestep => 120, 330, 540, 750, 960 indices
+# Same timestamps as Exp A (2.0h, 5.5h, 9.0h, 12.5h, 16.0h)
+# 60s timestep => 120, 330, 540, 750, 960 indices
 indices = np.linspace(120, 960, 5, dtype=int)
 times_hours = [i * 60 / 3600 for i in indices]
 
-fig, axes = plt.subplots(1, 5, figsize=(15, 10), constrained_layout=True)
-fig.suptitle('Experiment E: Physics Validation (f=0)', fontsize=20)
+# Layout matching Exp A (15, 8)
+fig, axes = plt.subplots(1, 5, figsize=(15, 8), constrained_layout=True)
+fig.suptitle('Experiment E: Physics Validation (f=0)', fontsize=20, y=1.06)
 
-# Match Exp A scale (approx +/- 0.008m based on user input)
-vmin = -0.008
-vmax = 0.008
+# Match Exp A scale (0.4 mm as requested)
+vmin = -0.4
+vmax = 0.4
+scale_mm = 1000.0
 
 for ax, idx, th in zip(axes, indices, times_hours):
-    data = ssh[idx, :, :]
+    data = ssh[idx, :, :] * scale_mm
     # Mask zero values if needed, or just plot
     # Assuming land is 0 or masked. In NEMO output, usually 0.
     
@@ -48,24 +52,17 @@ for ax, idx, th in zip(axes, indices, times_hours):
     ax.set_aspect('equal')
 
 # Colorbar
-cbar = fig.colorbar(im, ax=axes, orientation='horizontal', fraction=0.05, pad=0.05)
-cbar.set_label('SSH Anomaly (m)')
+cbar = fig.colorbar(im, ax=axes, orientation='horizontal', fraction=0.05, pad=0.03)
+cbar.set_label('SSH Anomaly (mm)')
 
 output_path = os.path.join(script_dir, output_file)
 plt.savefig(output_path, dpi=300, bbox_inches='tight')
 print(f"Saved {output_path}")
 
 
-# ds is already closed in original script logic, but let's keep it open or reopen
-# Actually, the original script does not close it until the end.
-# Let's add Hovmoller logic before closing.
-
 # --- Hovmöller Diagram ---
 # Path same as Exp A (East Coast, approx index 100)
 # Data shape (1440, 102, 22) => (Time, Lat, Lon)
-# East coast is at high X index. Let's pick index 20 (it is narrow).
-# Wait, let's check nav_lon from previous run.
-# Since domain is narrow (Exp A used nx-2).
 nx = ssh.shape[2]
 ny = ssh.shape[1]
 east_idx = nx - 2
@@ -82,12 +79,15 @@ y_time = np.arange(time_steps) * 60 / 3600
 # Space axis in indices (approx km)
 x_space = np.arange(ny)
 
-im2 = ax2.imshow(hovmoller, aspect='auto', origin='lower', cmap='RdBu_r',
-                 extent=[0, ny, 0, y_time[-1]], vmin=vmin, vmax=vmax)
+h_vmax = np.percentile(np.abs(hovmoller), 99) * scale_mm
+if h_vmax == 0: h_vmax = 0.4
+
+im2 = ax2.imshow(hovmoller * scale_mm, aspect='auto', origin='lower', cmap='RdBu_r',
+                 extent=[0, ny, 0, y_time[-1]], vmin=-h_vmax, vmax=h_vmax)
 ax2.set_xlabel('Latitude Index (South -> North)')
 ax2.set_ylabel('Time (hours)')
 ax2.set_title('Hovmöller Diagram (East Coast) - Exp E (f=0)')
-fig2.colorbar(im2, ax=ax2, label='SSH Anomaly (m)')
+fig2.colorbar(im2, ax=ax2, label='SSH Anomaly (mm)')
 
 out_hov = os.path.join(script_dir, 'fig_ExpE_hovmoller.png')
 plt.savefig(out_hov, dpi=300, bbox_inches='tight')
