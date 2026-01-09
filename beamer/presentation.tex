@@ -8,7 +8,7 @@
 
 % Custom Colors
 \definecolor{MyLightBlue}{HTML}{3993DD}
-\definecolor{MyWhite}{HTML}{FFFAFF}
+\definecolor{MyWhite}{HTML}{FFFFFF}
 \definecolor{MyDarkBlue}{HTML}{0A2463}
 \definecolor{MyRed}{HTML}{D8315B}
 \definecolor{MyBlack}{HTML}{1E1B18}
@@ -75,104 +75,206 @@
 \end{frame}
 
 % -----------------------------------------------------------------------------
-% Slide 1.5: Piano degli Esperimenti (TOC)
+% Slide 2: Piano degli Esperimenti (TOC)
 % -----------------------------------------------------------------------------
 \begin{frame}{Piano degli Esperimenti}
     Panoramica delle simulazioni effettuate:
     \vspace{0.5cm}
     \begin{itemize}
+        \setlength{\itemsep}{1em}
         \item \textbf{Baseline}:
         Configurazione di riferimento su fondo piatto.
-        \vspace{0.2cm}
         \item \textbf{Linearità}:
         Sensibilità all'ampiezza iniziale ($0.1$m, $0.5$m, $1.0$m).
-        \vspace{0.2cm}
         \item \textbf{Batimetria}:
         Effetto del fondale inclinato ($1000 \to 100$m).
-        \vspace{0.2cm}
         \item \textbf{Risoluzione}:
         Confronto tra risoluzione standard (10km) e alta (5km).
-        \vspace{0.2cm}
         \item \textbf{Fisica}:
         Analisi del ruolo della rotazione terrestre ($f=0$).
     \end{itemize}
 \end{frame}
 
 % -----------------------------------------------------------------------------
-% Slide 2: Exp A - Baseline Setup
+% Slide 3: Exp A - Baseline Setup
 % -----------------------------------------------------------------------------
-\begin{frame}{Exp A: Baseline (Setup)}
-    % TODO: Inserire contenuto
+\begin{frame}{Exp A: Baseline \& Evoluzione}
+    \begin{columns}
+        \begin{column}{0.6\textwidth}
+            \textbf{Configurazione:}
+            \begin{itemize}
+                \item Batimetria costante $H=100$ m.
+                \item Timestep $\Delta t = 60$ s, Durata 24h.
+            \end{itemize}
+            
+            \vspace{0.4cm}
+            \textbf{Dinamica:}
+            \begin{itemize}
+                \item L'onda si propaga in senso antiorario.
+                \item Rimane confinata alla costa (Onda di Kelvin).
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.4\textwidth}
+            \begin{figure}
+                \centering
+                \includegraphics[width=\linewidth,height=0.7\textheight,keepaspectratio]{../postprocessing/fig_expA_initial_state.png}
+            \end{figure}
+        \end{column}
+    \end{columns}
 \end{frame}
 
 % -----------------------------------------------------------------------------
-% Slide 3: Exp A - Evoluzione Spaziale
-% -----------------------------------------------------------------------------
-\begin{frame}{Exp A: Evoluzione Spaziale}
-    % TODO: Inserire contenuto
-\end{frame}
-
-% -----------------------------------------------------------------------------
-% Slide 4: Exp A - Analisi della Propagazione
+% Slide 5: Exp A - Analisi della Propagazione
 % -----------------------------------------------------------------------------
 \begin{frame}{Exp A: Diagramma di Hovmöller}
-    % TODO: Inserire contenuto
+    \begin{columns}
+        \begin{column}{0.4\textwidth}
+            Il diagramma spazio-tempo lungo la costa orientale mostra una propagazione lineare senza dispersione significativa.
+            
+            \vspace{0.5cm}
+            \textbf{Osservazioni:}
+            \begin{itemize}
+                 \item Velocità costante.
+                 \item Fase ben preservata.
+                 \item Accordo con la teoria lineare ($c = \sqrt{gH}$).
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.6\textwidth}
+            \begin{figure}
+                \centering
+                \only<1>{\includegraphics[width=\linewidth,height=0.85\textheight,keepaspectratio]{../postprocessing/fig_expA_hovmoller_east.png}}%
+                \only<2>{\includegraphics[width=\linewidth,height=0.85\textheight,keepaspectratio]{../postprocessing/fig_expA_hovmoller_east_theory.png}}
+            \end{figure}
+        \end{column}
+    \end{columns}
 \end{frame}
 
 % -----------------------------------------------------------------------------
-% Slide 5: Exp A - Struttura dell'Onda (Varianza)
+% Slide 6: Exp A - Struttura dell'Onda (Varianza)
 % -----------------------------------------------------------------------------
 \begin{frame}{Exp A: Punto Anfidromico}
-    % TODO: Inserire contenuto
+    \begin{columns}
+        \begin{column}{0.4\textwidth}
+            La mappa della varianza temporale dell'SSH identifica le zone di massima escursione (antinodi) e di minima (nodi).
+        \end{column}
+        \begin{column}{0.6\textwidth}
+            \begin{figure}
+                \centering
+                \only<1>{\includegraphics[width=\linewidth,height=0.85\textheight,keepaspectratio]{../postprocessing/fig_expA_ssh_variance.png}}%
+                \only<2>{\includegraphics[width=\linewidth,height=0.85\textheight,keepaspectratio]{../postprocessing/fig_expA_ssh_variance_contour.png}}
+            \end{figure}
+        \end{column}
+    \end{columns}
 \end{frame}
 
 % -----------------------------------------------------------------------------
-% Slide 6: Exp B - Verifica della Linearità
+% Slide 7: Exp B - Verifica della Linearità
 % -----------------------------------------------------------------------------
 \begin{frame}{Exp B: Sensibilità all'Ampiezza}
-    % TODO: Inserire contenuto
+    \textbf{Domanda:} Il modello risponde linearmente aumentando l'ampiezza iniziale?
+    \begin{itemize}
+        \item Tre simulazioni: $A_0 = 0.1$ m, $0.5$ m, $1.0$ m.
+    \end{itemize}
+
+    \begin{figure}
+        \centering
+        \includegraphics[width=0.65\textwidth]{../postprocessing/fig_expB_compare_linearity.png}
+    \end{figure}
 \end{frame}
 
 % -----------------------------------------------------------------------------
 % Slide 7: Exp C - Batimetria Variabile
 % -----------------------------------------------------------------------------
 \begin{frame}{Exp C: Effetto della Batimetria}
-    % TODO: Inserire contenuto
+    Introduzione di una pendenza "tipo Adriatico": $H(y)$ da 1000m (Sud) a 100m (Nord).
+    
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \begin{itemize}
+                \item La velocità di fase teorica $c=\sqrt{gH}$ varia nello spazio.
+                \item Ci aspettiamo un'onda più veloce a Sud ($c \approx 100$ m/s) che rallenta verso Nord ($c \approx 30$ m/s).
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{figure}
+                \centering
+                \includegraphics[width=0.9\textwidth]{../postprocessing/fig_ExpC_bathymetry_3D.png}
+            \end{figure}
+        \end{column}
+    \end{columns}
 \end{frame}
 
 % -----------------------------------------------------------------------------
 % Slide 8: Exp C - Risultati (Velocità di Fase)
 % -----------------------------------------------------------------------------
 \begin{frame}{Exp C: Confronto Velocità di Fase}
-    % TODO: Inserire contenuto
+    L'onda su fondale profondo (Exp C, linea Rossa) arriva a destinazione molto prima rispetto alla Baseline (linea Nera).
+
+    \begin{figure}
+        \centering
+        \includegraphics[width=0.75\textwidth]{../postprocessing/fig_ExpC_shoaling_comparison.png}
+    \end{figure}
 \end{frame}
 
 % -----------------------------------------------------------------------------
 % Slide 9: Exp C - Deformazione e Rossby Radius
 % -----------------------------------------------------------------------------
 \begin{frame}{Exp C: Dinamica e Raggio di Rossby}
-    % TODO: Inserire contenuto
+    \begin{itemize}
+        \item \textbf{Exp A (100m):} $R_d \approx 300$ km. Onda confinata alla costa.
+        \item \textbf{Exp C (1000m):} $R_d \approx 1000$ km. Onda a scala di bacino.
+    \end{itemize}
+    In acqua profonda il raggio di Rossby supera la larghezza del bacino: l'onda perde il carattere costiero "stretto".
+    
+    \begin{figure}
+        \centering
+        \includegraphics[width=0.9\textwidth]{../postprocessing/fig_ExpC_snapshots.png}
+    \end{figure}
 \end{frame}
 
 % -----------------------------------------------------------------------------
 % Slide 10: Exp D - Sensibilità alla Risoluzione
 % -----------------------------------------------------------------------------
 \begin{frame}{Exp D: Alta Risoluzione (5km)}
-    % TODO: Inserire contenuto
+    Confronto tra $\Delta x = 10$ km (Baseline) e $\Delta x = 5$ km.
+    
+    \begin{figure}
+        \centering
+        \includegraphics[width=0.75\textwidth]{../postprocessing/fig_ExpD_resolution_comparison.png}
+    \end{figure}
 \end{frame}
 
 % -----------------------------------------------------------------------------
 % Slide 11: Exp E - Validazione Fisica ($f=0$)
 % -----------------------------------------------------------------------------
 \begin{frame}{Exp E: Ruolo della Rotazione}
-    % TODO: Inserire contenuto
+    \textbf{Test:} Rimozione della forza di Coriolis ($f=0$).
+    \begin{itemize}
+        \item L'onda non è più intrappolata alla costa (Kelvin).
+        \item Si propaga come un'onda di gravità isotropa e decade rapidamente.
+    \end{itemize}
+
+    \begin{figure}
+        \centering
+        \includegraphics[width=0.9\textwidth]{../postprocessing/fig_ExpE_snapshots.png}
+    \end{figure}
 \end{frame}
 
 % -----------------------------------------------------------------------------
 % Slide 12: Conclusioni
 % -----------------------------------------------------------------------------
 \begin{frame}{Conclusioni}
-    % TODO: Inserire contenuto
+    \begin{enumerate}
+        \setlength{\itemsep}{1em}
+        \item \textbf{Dinamica Kelvin}: Il modello riproduce correttamente l'onda di Kelvin e il punto anfidromico (Exp A).
+        \item \textbf{Linearità}: Risposta perfettamente lineare per ampiezze fisiche (Exp B).
+        \item \textbf{Topografia}: La batimetria controlla la velocità di fase ($c=\sqrt{gH}$), con ottimo accordo teorico (Exp C).
+        \item \textbf{Fisica}: Il confinamento costiero è un effetto esclusivo della rotazione (Exp E).
+    \end{enumerate}
+    
+    \vspace{1cm}
+    \centering
+    \large \textbf{Grazie per l'attenzione!}
 \end{frame}
 
 \end{document}

@@ -65,6 +65,30 @@ def analyze_wave():
         print("Warning: No coordinates found. Using indices.")
         lat, lon = np.meshgrid(np.arange(ssh.shape[1]), np.arange(ssh.shape[2]), indexing='ij')
 
+    # --- 0. Initial State (T=0) ---
+    print("Generating Initial State Plot...")
+    t_step_0 = 0
+    ssh_t0 = ssh[t_step_0, :, :] * 1000 # Convert to mm
+    vmax_init = 0.4
+    
+    fig_init, ax_init = plt.subplots(figsize=(6, 8), constrained_layout=True)
+    if 'lon' in locals() and lon is not None:
+        im_init = ax_init.pcolormesh(lon, lat, ssh_t0, cmap='RdBu_r', shading='auto', vmin=-vmax_init, vmax=vmax_init)
+        ax_init.set_xlabel('Longitude (°E)')
+        ax_init.set_ylabel('Latitude (°N)')
+        ax_init.set_aspect('equal')
+    else:
+        im_init = ax_init.imshow(ssh_t0, origin='lower', cmap='RdBu_r', vmin=-vmax_init, vmax=vmax_init)
+        ax_init.set_xlabel('I')
+        ax_init.set_ylabel('J')
+
+    ax_init.set_title(f'Initial State (T=0)\nSSH Anomaly (mm)', fontsize=14)
+    fig_init.colorbar(im_init, ax=ax_init, label='SSH (mm)', shrink=0.8)
+    
+    output_path_init = os.path.join(script_dir, 'fig_expA_initial_state.png')
+    plt.savefig(output_path_init, dpi=300, bbox_inches='tight')
+    print(f"Saved {output_path_init}")
+
     # --- 1. Hovmöller Diagram (Index-based) ---
     print("Generating Hovmöller Diagram...")
     ny, nx = ssh.shape[1], ssh.shape[2]
@@ -107,6 +131,7 @@ def analyze_wave():
     # Use fixed scale for consistency
     h_vmax = 0.4
     
+    # 1a. Standard Hovmöller
     plt.imshow(hovmoller_mm, aspect='auto', origin='lower', cmap='RdBu_r', 
                vmin=-h_vmax, vmax=h_vmax,
                extent=[0, ny*10, 0, ssh.shape[0]*60/3600])
@@ -117,7 +142,40 @@ def analyze_wave():
     plt.savefig(os.path.join(script_dir, 'fig_expA_hovmoller_east.png'), dpi=300)
     print(f"Saved {os.path.join(script_dir, 'fig_expA_hovmoller_east.png')}")
 
-    # Georeferenced Plot
+    # 1b. Hovmöller with Theory Line
+    print("Generating Hovmöller Diagram with Theory Line...")
+    plt.figure(figsize=(10, 8))
+    
+    # Time/Dist info
+    total_time_hours_theory = ssh.shape[0] * 60.0 / 3600
+    total_dist_km_theory = ny * 10 
+    
+    plt.imshow(hovmoller_mm, aspect='auto', origin='lower', cmap='RdBu_r', 
+               vmin=-h_vmax, vmax=h_vmax,
+               extent=[0, total_dist_km_theory, 0, total_time_hours_theory])
+    
+    # Theoretical Line: c = sqrt(g * H)
+    g_grav = 9.81
+    H_depth = 100.0
+    c_theory = np.sqrt(g_grav * H_depth) # ~ 31.32 m/s
+    
+    x_km_theory = np.linspace(0, total_dist_km_theory, 100)
+    x_m_theory = x_km_theory * 1000.0
+    t_sec_theory = x_m_theory / c_theory
+    t_hours_theory = t_sec_theory / 3600.0
+    
+    plt.plot(x_km_theory, t_hours_theory, 'k--', linewidth=2, label=f'Theory c={c_theory:.1f} m/s')
+    
+    plt.colorbar(label='SSH (mm)')
+    plt.xlabel('Distance along Coast (km)')
+    plt.ylabel('Time (hours)')
+    plt.title('Hovmöller Diagram (East Coast Path)')
+    plt.legend(loc='upper right')
+    plt.savefig(os.path.join(script_dir, 'fig_expA_hovmoller_east_theory.png'), dpi=300)
+    print(f"Saved {os.path.join(script_dir, 'fig_expA_hovmoller_east_theory.png')}")
+
+
+    # Georeferenced Snapshots
     print("Generating Georeferenced Snapshots...")
     # Plot 5 snapshots from 2h to 16h as requested
     # 2h = 120 steps, 16h = 960 steps
@@ -191,15 +249,15 @@ def analyze_wave():
         ssh_slice = ssh[:]
     
     ssh_var = np.var(ssh_slice, axis=0)
-    vmax = np.percentile(ssh_var, 99)
-    print(f"Variance Map Vmax: {vmax}")
+    vmax_var = np.percentile(ssh_var, 99)
+    print(f"Variance Map Vmax: {vmax_var}")
 
-    # Use subplots with constrained_layout
-    # Adjusted figsize to be narrower to minimize whitespace for narrow basin
-    fig, ax = plt.subplots(figsize=(5, 9), constrained_layout=True)
+    # 3a. Standard Variance Plot
+    # Use standardized figsize (5.5, 9)
+    fig, ax = plt.subplots(figsize=(5.5, 9), constrained_layout=True)
     
     if 'lon' in locals() and lon is not None:
-        im = ax.pcolormesh(lon, lat, ssh_var, cmap='viridis', shading='auto', vmax=vmax)
+        im = ax.pcolormesh(lon, lat, ssh_var, cmap='viridis', shading='auto', vmax=vmax_var)
         ax.set_xlabel('Longitude (°E)')
         ax.set_ylabel('Latitude (°N)')
         if extent:
@@ -207,16 +265,45 @@ def analyze_wave():
             ax.set_ylim(extent[2], extent[3])
         ax.set_aspect('equal')
     else:
-        im = ax.imshow(ssh_var, origin='lower', cmap='viridis', vmax=vmax)
+        im = ax.imshow(ssh_var, origin='lower', cmap='viridis', vmax=vmax_var)
         ax.set_xlabel('I Index')
         ax.set_ylabel('J Index')
         
-    fig.colorbar(im, ax=ax, label='SSH Variance ($m^2$)', shrink=0.8)
-    ax.set_title('SSH Variance (Node Identification)', pad=20)
+    fig.colorbar(im, ax=ax, label='SSH Variance ($m^2$)', shrink=0.8, format='%.1e')
+    ax.set_title('SSH Variance', fontsize=14)
     
-    # bbox_inches='tight' removes extra whitespace around the plot
     plt.savefig(os.path.join(script_dir, 'fig_expA_ssh_variance.png'), dpi=300, bbox_inches='tight')
     print(f"Saved {os.path.join(script_dir, 'fig_expA_ssh_variance.png')}")
+
+    # 3b. Variance Contour Plot
+    print("Generating Variance Contour Plot...")
+    # Use standardized figsize (5.5, 9)
+    fig_contour, ax_contour = plt.subplots(figsize=(5.5, 9), constrained_layout=True)
+    
+    # Ensure 0 is included
+    levels = np.linspace(0, vmax_var, 15)
+
+    if 'lon' in locals() and lon is not None:
+        # Filled contours
+        cf = ax_contour.contourf(lon, lat, ssh_var, levels=levels, cmap='viridis', extend='max')
+        # Line contours
+        c = ax_contour.contour(lon, lat, ssh_var, levels=levels, colors='white', linewidths=0.5, alpha=0.5)
+        ax_contour.set_xlabel('Longitude (°E)')
+        ax_contour.set_ylabel('Latitude (°N)')
+        ax_contour.set_aspect('equal')
+    else:
+        cf = ax_contour.contourf(ssh_var, levels=levels, cmap='viridis', extend='max')
+        c = ax_contour.contour(ssh_var, levels=levels, colors='white', linewidths=0.5, alpha=0.5)
+        ax_contour.set_xlabel('I Index')
+        ax_contour.set_ylabel('J Index')
+
+    ax_contour.set_title('SSH Variance', fontsize=14)
+    # Use scientific notation for small variance values
+    fig_contour.colorbar(cf, ax=ax_contour, label='SSH Variance ($m^2$)', orientation='vertical', shrink=0.8, format='%.1e')
+    
+    output_path_contour = os.path.join(script_dir, 'fig_expA_ssh_variance_contour.png')
+    plt.savefig(output_path_contour, dpi=300, bbox_inches='tight')
+    print(f"Saved {output_path_contour}")
 
     ds.close()
 
