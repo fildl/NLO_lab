@@ -66,6 +66,44 @@ def compare_runs_20km():
     
     print(f"Monitoring Point (North): J={j_venice}, I={i_venice}")
 
+    # --- 0. Location Map ---
+    # Requested similar to fig_expA_path.png
+    plt.figure(figsize=(4, 8))
+    
+    # Create mask based on activity (where waves propagate)
+    # This avoids masking water as land if it starts at 0
+    ssh_all = data[list(data.keys())[0]]['ssh']
+    water_mask = np.any(np.abs(ssh_all) > 1e-9, axis=0)
+    
+    # Mask the land (False values)
+    mask_plot = np.ma.masked_where(~water_mask, np.ones_like(water_mask))
+    
+    if lon is not None:
+        # Plot water with a light color
+        plt.pcolormesh(lon, lat, mask_plot, cmap='Blues', vmin=0, vmax=1.5, shading='auto')
+        # Plot point
+        pt_lon = lon[j_venice, i_venice]
+        pt_lat = lat[j_venice, i_venice]
+        plt.plot(pt_lon, pt_lat, 'r*', markersize=15, markeredgecolor='black', label='Extraction Point')
+        
+        plt.xlabel('Longitude (°E)')
+        plt.ylabel('Latitude (°N)')
+        if extent:
+            plt.xlim(extent[0], extent[1])
+            plt.ylim(extent[2], extent[3])
+    else:
+        plt.imshow(mask_plot, origin='lower', cmap='Blues', vmin=0, vmax=1.5)
+        plt.plot(i_venice, j_venice, 'r*', markersize=15, markeredgecolor='black', label='Extraction Point')
+        plt.xlabel('I Index')
+        plt.ylabel('J Index')
+        
+    plt.title('Exp B: Monitoring Location')
+    plt.legend(loc='lower left')
+    plt.axis('equal')
+    plt.tight_layout()
+    plt.savefig(os.path.join(script_dir, 'fig_expB_location.png'), dpi=300)
+    print(f"Saved {os.path.join(script_dir, 'fig_expB_location.png')}")
+
     plt.figure(figsize=(10, 6))
     for key, d in data.items():
         ts = d['norm_ssh'][:, j_venice, i_venice]

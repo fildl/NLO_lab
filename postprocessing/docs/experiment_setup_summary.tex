@@ -46,15 +46,15 @@ ze1 = 10000._wp / REAL( nn_GYRE , wp )
 \subsection{usrdef\_istate.F90 (Stato Iniziale)}
 Adattato da \texttt{TSUNAMI} per generare una perturbazione Gaussiana dell'SSH.
 \begin{itemize}
-    \item \textbf{Centro}: 19.0°E, 40.5°N
-    \item \textbf{Raggio ($R$)}: 20 km (aggiornato da 50km per segnale più pulito)
-    \item \textbf{Ampiezza ($A_0$)}: Variabile (0.1m, 0.5m, 1.0m)
+    \item \textbf{Centro}: 23.6°E, 40.5°N (Spostato sul bordo Est)
+    \item \textbf{Raggio ($R$)}: 10 km (Ridotto da 20km)
+    \item \textbf{Ampiezza ($A_0$)}: 0.1m (Test iniziale)
 \end{itemize}
 
 \subsection{usrdef\_nam.F90 (Dimensioni)}
 Dimensioni del dominio impostate per un rettangolo allungato:
 \begin{lstlisting}[language=Fortran, frame=single, basicstyle=\small\ttfamily]
-kpi = 20 * nn_GYRE + 2  ! Larghezza (x)
+kpi = 42 * nn_GYRE + 2  ! Larghezza (x) estesa (+22 punti)
 kpj = 100 * nn_GYRE + 2 ! Lunghezza (y)
 \end{lstlisting}
 

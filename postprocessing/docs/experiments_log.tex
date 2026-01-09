@@ -79,8 +79,15 @@ Il percorso di estrazione per il diagramma di Hovmöller scorre lungo la costa o
 Il diagramma lungo la costa Est (Figura \ref{fig:hov_A}, destra) mostra una propagazione lineare senza distorsioni.
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{fig_expA_hovmoller.png}
-    \caption{Sinistra: Percorso di estrazione (linea rossa) per il diagramma di Hovmöller. Destra: Diagramma di Hovmöller.}
+    \begin{minipage}{0.4\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{fig_expA_path.png}
+    \end{minipage}%
+    \begin{minipage}{0.6\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{fig_expA_hovmoller_east.png}
+    \end{minipage}
+    \caption{Sinistra: Percorso di estrazione (linea rossa). Destra: Diagramma di Hovmöller.}
     \label{fig:hov_A}
 \end{figure}
 
@@ -106,8 +113,15 @@ Non si osservano sfasamenti temporali, la velocità di fase $c = \sqrt{gh}$ non 
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\textwidth]{fig_expB_compare_linearity.png}
-    \caption{Confronto delle serie temporali normalizzate all'Estremità Nord.}
+    \begin{minipage}{0.4\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{fig_expB_location.png}
+    \end{minipage}%
+    \begin{minipage}{0.6\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{fig_expB_compare_linearity.png}
+    \end{minipage}
+    \caption{Sinistra: Punto di estrazione (ross). Destra: Confronto serie temporali normalizzate.}
     \label{fig:linearity}
 \end{figure}
 
@@ -155,7 +169,7 @@ Il sistema si comporta in modo \textbf{lineare} per perturbazioni fino a 1.0 m s
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.3\textwidth]{fig_ExpC_bathymetry_3D.png}
+    \includegraphics[width=0.3\textwidth]{fig_ExpC_bathymetry_3D_0.png}
     \caption{Batimetria Esperimento C: Pendenza lineare lungo $y$.}
     \label{fig:bathyC}
 \end{figure}
@@ -168,7 +182,7 @@ Per analizzare questo fenomeno, in Figura \ref{fig:shoaling_profile} confronto l
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\textwidth]{fig_ExpC_shoaling_profile.png}
+    \includegraphics[width=0.8\textwidth]{fig_ExpC_shoaling_profile_0.png}
     \caption{Profilo di Shoaling: Ampiezza massima lungo la costa vs Legge di Green teorica.}
     \label{fig:shoaling_profile}
 \end{figure}
@@ -184,7 +198,7 @@ Un altro effetto fondamentale della profondità variabile è sulla \textbf{Veloc
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\textwidth]{fig_ExpC_shoaling_comparison.png}
+    \includegraphics[width=0.8\textwidth]{fig_ExpC_shoaling_comparison_0.png}
     \caption{Confronto SSH a Nord. Esperimento C (Rosso) vs Baseline (Nero).}
     \label{fig:shoaling}
 \end{figure}
@@ -198,7 +212,7 @@ La pendenza della traccia numerica segue la curva teorica (linea tratteggiata), 
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1.0\textwidth]{fig_ExpC_hovmoller_comparison.png}
+    \includegraphics[width=1.0\textwidth]{fig_ExpC_hovmoller_comparison_0.png}
     \caption{Confronto Diagrammi di Hovmöller. A sinistra: Exp A (velocità costante). A destra: Exp C con curva teorica sovrapposta (linea tratteggiata).}
     \label{fig:hovmollerC}
 \end{figure}
@@ -212,7 +226,7 @@ Gli snapshots in Figura \ref{fig:snapshotsC} (Exp C), confrontati con quelli del
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.95\textwidth]{fig_ExpC_snapshots.png}
+    \includegraphics[width=0.95\textwidth]{fig_ExpC_snapshots_0.png}
     \caption{Snapshots Esperimento C.}
     \label{fig:snapshotsC}
 \end{figure}
@@ -238,7 +252,7 @@ La Figura \ref{fig:res_compare} mostra il confronto diretto dell'SSH all'Estremi
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{fig_ExpD_resolution_comparison.png}
+    \includegraphics[width=0.9\textwidth]{fig_ExpD_resolution_comparison_0.png}
     \caption{Confronto SSH all'Estremità Nord: Baseline (Nero, 10km) vs Alta Risoluzione (Rosso, 5km).}
     \label{fig:res_compare}
 \end{figure}
@@ -249,7 +263,7 @@ Il diagramma spazio-tempo per il caso ad alta risoluzione (Figura \ref{fig:hov_D
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\textwidth]{fig_ExpD_hovmoller.png}
+    \includegraphics[width=0.8\textwidth]{fig_ExpD_hovmoller_0.png}
     \caption{Diagramma di Hovmöller per Exp D (5km).}
     \label{fig:hov_D}
 \end{figure}
@@ -269,7 +283,7 @@ Questo conferma che il confinamento costiero osservato nella Baseline è dovuto 
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{fig_ExpE_snapshots.png}
+    \includegraphics[width=0.9\textwidth]{fig_ExpE_snapshots_0.png}
     \caption{Snapshots Exp E ($f=0$).}
     \label{fig:expE_snap}
 \end{figure}

@@ -100,50 +100,23 @@ def analyze_wave():
         print("Saved fig_expA_path.png")
 
     plt.figure(figsize=(10, 8))
+    
+    # Convert to mm
+    hovmoller_mm = hovmoller * 1000
+    
     # Use robust vmin/vmax for visibility
-    h_vmax = np.percentile(np.abs(hovmoller), 99)
+    h_vmax = np.percentile(np.abs(hovmoller_mm), 99)
     if h_vmax == 0: h_vmax = 0.05
     
-    plt.imshow(hovmoller, aspect='auto', origin='lower', cmap='RdBu_r', 
+    plt.imshow(hovmoller_mm, aspect='auto', origin='lower', cmap='RdBu_r', 
                vmin=-h_vmax, vmax=h_vmax,
                extent=[0, ny*10, 0, ssh.shape[0]*60/3600])
-    plt.colorbar(label='SSH (m)')
+    plt.colorbar(label='SSH (mm)')
     plt.xlabel('Distance along Coast (km)')
     plt.ylabel('Time (hours)')
     plt.title('Hovmöller Diagram (East Coast Path)')
     plt.savefig(os.path.join(script_dir, 'fig_expA_hovmoller_east.png'), dpi=300)
     print(f"Saved {os.path.join(script_dir, 'fig_expA_hovmoller_east.png')}")
-
-    # --- 2. Snapshots (Index-based & Georeferenced) ---
-    print("Generating Snapshots...")
-    # Shifted times to avoid initial perturbation: 4h, 10h, 16h, 22h
-    times_idx = [240, 600, 960, 1320]
-    
-    # Dynamic limit (exclude first 2 hours for scaling)
-    vmax = np.max(np.abs(ssh[120:,:,:])) * 0.8
-    if vmax < 1e-4: vmax = 0.05
-
-    # Index-based Plot
-    # Tall and narrow domain: Use square figure with constrained layout to center plots
-    fig, axes = plt.subplots(1, 4, figsize=(10, 10), constrained_layout=True)
-    
-    for i, tidx in enumerate(times_idx):
-        if tidx < ssh.shape[0]:
-            ax = axes[i]
-            data = ssh[tidx, :, :]
-            data = np.ma.masked_where(tmask == 0, data)
-            im = ax.imshow(data, origin='lower', cmap='RdBu_r', vmin=-vmax, vmax=vmax)
-            ax.set_title(f'T = {tidx*60/3600:.1f} h')
-            
-            # Horizontal colorbar for better use of space
-            plt.colorbar(im, ax=ax, fraction=0.046, pad=0.04, orientation='horizontal')
-            
-            ax.set_xlabel('I')
-            if i==0: ax.set_ylabel('J')
-            else: ax.set_yticklabels([])
-            
-    plt.savefig(os.path.join(script_dir, 'fig_expA_ssh_snapshots_index.png'), dpi=300)
-    print(f"Saved {os.path.join(script_dir, 'fig_expA_ssh_snapshots_index.png')}")
 
     # Georeferenced Plot
     print("Generating Georeferenced Snapshots...")
@@ -154,13 +127,17 @@ def analyze_wave():
     # Calculate robust Vmax from the selected frames ONLY
     # This ensures colorbar is not saturated by unshown transients
     selected_ssh = ssh[steps, :, :]
-    vmax_local = np.percentile(np.abs(selected_ssh), 99.9) # Use 99.9 to avoid single pixel spikes
-    print(f"Index-based Vmax: {vmax_local}")
+    
+    # Convert to mm for plotting
+    selected_ssh_mm = selected_ssh * 1000
+    
+    vmax_local = np.percentile(np.abs(selected_ssh_mm), 99.9) # Use 99.9 to avoid single pixel spikes
+    print(f"Index-based Vmax (mm): {vmax_local}")
     
     # Larger fonts
     plt.rcParams.update({'font.size': 14, 'axes.titlesize': 16, 'axes.labelsize': 14})
     
-    fig, axes = plt.subplots(1, 5, figsize=(15, 10), constrained_layout=True)
+    fig, axes = plt.subplots(1, 5, figsize=(15, 8), constrained_layout=True)
     
     # Calculate bounds (re-check if lon is defined)
     if 'lon' not in locals() or lon is None: extent = None
@@ -172,7 +149,9 @@ def analyze_wave():
     for i, t_step in enumerate(steps):
         if t_step >= ssh.shape[0]: continue
         ax = axes[i]
-        data_step = ssh[t_step, :, :]
+        
+        # Get data and convert to mm
+        data_step = ssh[t_step, :, :] * 1000
         
         if 'lon' in locals() and lon is not None:
             # Symmetic Vmin/Vmax
@@ -193,9 +172,12 @@ def analyze_wave():
         time_hours = t_step * 60 / 3600
         ax.set_title(f"T = {time_hours:.1f} h")
 
-    fig.suptitle('Kelvin Wave Propagation (SSH)', fontsize=20)
+    # Reduced top spacing by bringing title closer, but ensuring no overlap
+    fig.suptitle('Kelvin Wave Propagation (SSH)', fontsize=20, y=1.06)
+    
     # Add shared colorbar
-    fig.colorbar(im, ax=axes, orientation='horizontal', fraction=0.05, pad=0.02, label='SSH (m)')
+    # Pad reduced to bring it closer
+    fig.colorbar(im, ax=axes, orientation='horizontal', fraction=0.05, pad=0.03, label='SSH (mm)')
     
     plt.savefig(os.path.join(script_dir, 'fig_expA_ssh_snapshots.png'), dpi=300, bbox_inches='tight')
     print(f"Saved {os.path.join(script_dir, 'fig_expA_ssh_snapshots.png')}")
@@ -231,7 +213,7 @@ def analyze_wave():
         ax.set_ylabel('J Index')
         
     fig.colorbar(im, ax=ax, label='SSH Variance ($m^2$)', shrink=0.8)
-    ax.set_title('SSH Variance (Node Identification)')
+    ax.set_title('SSH Variance (Node Identification)', pad=20)
     
     # bbox_inches='tight' removes extra whitespace around the plot
     plt.savefig(os.path.join(script_dir, 'fig_expA_ssh_variance.png'), dpi=300, bbox_inches='tight')
