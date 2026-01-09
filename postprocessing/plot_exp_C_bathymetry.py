@@ -86,9 +86,22 @@ def analyze_dataset(config):
                vmin=-h_vmax, vmax=h_vmax,
                extent=[0, ny*10, 0, ssh.shape[0]*dt_c/3600]) # Approx 10km grid
     plt.colorbar(label='SSH (mm)')
-    plt.xlabel('Distance South-North (km approx)')
+    plt.xlabel('Distance along the coast (km)')
     plt.ylabel('Time (hours)')
     plt.title(f'Exp C ({filename}): Hovmöller Diagram')
+
+    # Theoretical Curve for Exp C (Slope)
+    # H(y) = 1000 - (1000-100) * y / L
+    L_meters = ny * 10000.0 # Length in meters (approx 10km res)
+    y_pts = np.linspace(0, L_meters, 100)
+    h_pts = 1000.0 - (1000.0 - 100.0) * y_pts / L_meters
+    c_pts = np.sqrt(9.81 * h_pts)
+    t_pts = np.cumsum(1.0 / c_pts) * (y_pts[1]-y_pts[0]) # Simple integration
+    t_hrs = t_pts / 3600.0
+    
+    # Plot Theory Curve
+    plt.plot(y_pts / 1000.0, t_hrs, 'k--', linewidth=2, label='Profilo teorico di velocità')
+    plt.legend()
     plt.savefig(os.path.join(script_dir, f'fig_ExpC_hovmoller{suffix}.png'), dpi=300)
     print(f"Saved fig_ExpC_hovmoller{suffix}.png")
 

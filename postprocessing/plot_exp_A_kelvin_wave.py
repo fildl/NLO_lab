@@ -136,7 +136,7 @@ def analyze_wave():
                vmin=-h_vmax, vmax=h_vmax,
                extent=[0, ny*10, 0, ssh.shape[0]*60/3600])
     plt.colorbar(label='SSH (mm)')
-    plt.xlabel('Distance along Coast (km)')
+    plt.xlabel('Distance along the coast (km)')
     plt.ylabel('Time (hours)')
     plt.title('Hovmöller Diagram (East Coast Path)')
     plt.savefig(os.path.join(script_dir, 'fig_expA_hovmoller_east.png'), dpi=300)
@@ -167,7 +167,7 @@ def analyze_wave():
     plt.plot(x_km_theory, t_hours_theory, 'k--', linewidth=2, label=f'Theory c={c_theory:.1f} m/s')
     
     plt.colorbar(label='SSH (mm)')
-    plt.xlabel('Distance along Coast (km)')
+    plt.xlabel('Distance along the coast (km)')
     plt.ylabel('Time (hours)')
     plt.title('Hovmöller Diagram (East Coast Path)')
     plt.legend(loc='upper right')
