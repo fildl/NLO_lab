@@ -95,4 +95,20 @@ Di seguito le variazioni dei parametri chiave per ogni esperimento condotto.
     \item \textbf{Exp E}: Modificato \texttt{usrdef\_hgr.F90} per forzare \texttt{pff\_f = pff\_t = 0} (No Coriolis). Ripristinato \texttt{namelist\_cfg} alla Baseline.
 \end{itemize}
 
+\section{Setup Proposto: Sigma Coordinates}
+Per futuri esperimenti con batimetria "smooth" (Terrain Following), modificare:
+
+\subsection{namelist\_cfg}
+\begin{lstlisting}[language=Fortran, frame=single, basicstyle=\small\ttfamily]
+ln_hpg_zco = .false.
+ln_hpg_sco = .true.  ! Pressione idrostatica in coordinate Sigma
+\end{lstlisting}
+
+\subsection{usrdef\_zgr.F90}
+\begin{itemize}
+    \item Impostare flag: \texttt{ld\_sco = .TRUE.}, \texttt{ld\_zco = .FALSE.}
+    \item \textbf{zgr\_msk\_top\_bot}: Impostare \texttt{k\_bot = jpk - 1} costante (tutta la colonna è bagnata).
+    \item \textbf{zgr\_zco}: Scalare profondità ($dept$) e spessori ($e3$) con il rapporto $H_{local}/H_{max}$.
+\end{itemize}
+
 \end{document}

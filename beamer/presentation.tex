@@ -6,6 +6,24 @@
 \setbeamertemplate{navigation symbols}{}
 \setbeamertemplate{caption}[numbered]
 
+% Custom Colors
+\definecolor{MyLightBlue}{HTML}{3993DD}
+\definecolor{MyWhite}{HTML}{FFFAFF}
+\definecolor{MyDarkBlue}{HTML}{0A2463}
+\definecolor{MyRed}{HTML}{D8315B}
+\definecolor{MyBlack}{HTML}{1E1B18}
+
+% Apply Colors
+\setbeamercolor{structure}{fg=MyDarkBlue}
+\setbeamercolor{palette primary}{bg=MyDarkBlue,fg=MyWhite}
+\setbeamercolor{palette secondary}{bg=MyLightBlue,fg=MyWhite}
+\setbeamercolor{palette tertiary}{bg=MyRed,fg=MyWhite}
+\setbeamercolor{alerted text}{fg=MyRed}
+\setbeamercolor{titlelike}{parent=palette primary,fg=MyWhite}
+\setbeamercolor{frametitle}{bg=MyDarkBlue,fg=MyWhite}
+\setbeamercolor{background canvas}{bg=MyWhite}
+\setbeamercolor{normal text}{fg=MyBlack}
+
 % Packages
 \usepackage[utf8]{inputenc}
 \usepackage{graphicx}
@@ -27,11 +45,57 @@
     \titlepage
 \end{frame}
 
-% -----------------------------------------------------------------------------
-% Slide 1: Introduzione
-% -----------------------------------------------------------------------------
 \begin{frame}{Introduzione e Obiettivi}
-    % TODO: Inserire contenuto
+    \begin{columns}
+        \begin{column}{0.65\textwidth}
+            \begin{itemize}
+                \item \textbf{Obiettivo del Progetto:}
+                \begin{itemize}
+                    \item Studiare la propagazione dell'\textbf{Onda di Kelvin} in un bacino idealizzato (analogo all'Adriatico).
+                    \item Analizzare la sensibilità del \textbf{modello NEMO} a variazioni dei parametri fisici e numerici.
+                \end{itemize}
+                
+                \vspace{0.3cm}
+                
+                \item \textbf{Dominio Computazionale:}
+                \begin{itemize}
+                    \item Griglia rettangolare $44 \times 102$ punti.
+                    \item Risoluzione orizzontale $\Delta x \approx 10$ km.
+                    \item \textbf{Perturbazione}: Anomalia Gaussiana ($A_0 = 0.1$ m) a Sud-Est.
+                \end{itemize}
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.35\textwidth}
+            \begin{figure}
+                \centering
+                \includegraphics[width=\textwidth]{../postprocessing/fig_expA_initial_state.png}
+            \end{figure}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+% Slide 1.5: Piano degli Esperimenti (TOC)
+% -----------------------------------------------------------------------------
+\begin{frame}{Piano degli Esperimenti}
+    Panoramica delle simulazioni effettuate:
+    \vspace{0.5cm}
+    \begin{itemize}
+        \item \textbf{Exp A (Baseline)}:
+        Configurazione di riferimento su fondo piatto ($H=100$m).
+        \vspace{0.2cm}
+        \item \textbf{Exp B (Linearità)}:
+        Sensibilità all'ampiezza iniziale ($0.1, 0.5, 1.0$m).
+        \vspace{0.2cm}
+        \item \textbf{Exp C (Batimetria)}:
+        Effetto dello shoaling su fondo inclinato ($1000 \to 100$m).
+        \vspace{0.2cm}
+        \item \textbf{Exp D (Risoluzione)}:
+        Confronto tra risoluzione standard (10km) e alta (5km).
+        \vspace{0.2cm}
+        \item \textbf{Exp E (Fisica)}:
+        Analisi del ruolo della rotazione terrestre ($f=0$).
+    \end{itemize}
 \end{frame}
 
 % -----------------------------------------------------------------------------

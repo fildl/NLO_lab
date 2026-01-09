@@ -3,6 +3,8 @@
 \usepackage{geometry}
 \usepackage{graphicx}
 \usepackage{float}
+\usepackage{listings}
+\usepackage{xcolor}
 \usepackage{amsmath}
 \usepackage{hyperref}
 
@@ -298,5 +300,52 @@ Questo conferma che il confinamento costiero osservato nella Baseline è dovuto 
     \caption{Hovmöller Exp E: Assenza di segnale coerente lungo il bordo (l'onda si allontana).}
     \label{fig:hovE}
 \end{figure}
+
+\newpage
+\appendix
+\section{Guida all'Implementazione: Coordinate Sigma}
+Per testare la configurazione con coordinate Sigma (e rimuovere gli "scalini" della batimetria), sono necessarie le seguenti modifiche al codice e al namelist.
+
+\subsection{1. Modifiche a \texttt{namelist\_cfg}}
+Cambiare il metodo di calcolo del gradiente di pressione idrostatico:
+\begin{lstlisting}[language=Fortran, frame=single, basicstyle=\small\ttfamily]
+! In &namdyn_hpg
+ln_hpg_zco = .false.   ! Disabilita Z-coordinates
+ln_hpg_sco = .true.    ! Abilita Sigma-coordinates
+\end{lstlisting}
+
+\subsection{2. Modifiche a \texttt{usrdef\_zgr.F90}}
+È necessario ridefinire la griglia verticale per seguire il terreno.
+
+\textbf{A. Flag Iniziali (\texttt{usr\_def\_zgr})}
+Disabilitare Z-coord e abilitare Sigma:
+\begin{lstlisting}[language=Fortran, frame=single, basicstyle=\small\ttfamily]
+ld_zco = .FALSE.
+ld_zps = .FALSE.
+ld_sco = .TRUE.  ! Attiva Sigma
+\end{lstlisting}
+
+\textbf{B. Mascheramento (\texttt{zgr\_msk\_top\_bot})}
+In coordinate Sigma, tutti i livelli sono bagnati fino al fondo ($k_{bot} = jpk-1$ ovunque):
+\begin{lstlisting}[language=Fortran, frame=single, basicstyle=\small\ttfamily]
+DO jj = 1, jpj
+   DO ji = 1, jpi
+      k_bot(ji,jj) = jpkm1 
+   END DO
+END DO
+\end{lstlisting}
+
+\textbf{C. Scaling Verticale (\texttt{zgr\_zco})}
+Sostituire la logica di \texttt{zgr\_zco} per scalare i livelli 1D in base alla profondità locale ($H_{local} / H_{ref}$):
+\begin{lstlisting}[language=Fortran, frame=single, basicstyle=\small\ttfamily]
+! Calcolo fattore di scala
+zscale = zmy_depth / 1000._wp
+
+! Scalatura Profondita' e Spessori
+pdept(ji,jj,jk) = pdept_1d(jk) * zscale
+pdepw(ji,jj,jk) = pdepw_1d(jk) * zscale
+pe3t (ji,jj,jk) = pe3t_1d (jk) * zscale
+pe3w (ji,jj,jk) = pe3w_1d (jk) * zscale
+\end{lstlisting}
 
 \end{document}
