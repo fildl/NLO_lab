@@ -74,15 +74,15 @@ Di seguito le variazioni dei parametri chiave per ogni esperimento condotto.
 \begin{table}[h]
 \centering
 \renewcommand{\tabularxcolumn}[1]{>{\centering\arraybackslash}m{#1}}
-\begin{tabularx}{\textwidth}{|c|c|c|c|X|}
+\begin{tabularx}{\textwidth}{|c|c|c|c|c|X|}
 \hline
-\textbf{Exp} & \textbf{nn\_GYRE} & \textbf{rn\_Dt (s)} & \textbf{Batimetria} & \textbf{Note} \\ \hline
+\textbf{Exp} & \textbf{nn\_GYRE} & \textbf{rn\_Dt (s)} & \textbf{nn\_itend} & \textbf{Batimetria} & \textbf{Note} \\ \hline
 
-\textbf{A} & 1 ($\Delta x \approx 10$km) & 60 & Piatta 100m & Baseline \\ \hline
-\textbf{B} & 1 ($\Delta x \approx 10$km) & 60 & Piatta 100m & $A_0 \in [0.1, 0.5, 1.0]$. Check Linearità. \\ \hline
-\textbf{C} & 1 ($\Delta x \approx 10$km) & 20 & Pendenza $1000 \to 100$m & Shoaling. $zdep\_min=100m$ per stabilità. \\ \hline
-\textbf{D} & 2 ($\Delta x \approx 5$km) & 20 & Piatta 100m & Media Risoluzione (CFL Sicuro). \\ \hline
-\textbf{E} & 1 ($\Delta x \approx 10$km) & 60 & Piatta 100m & $f=0$. Validazione Fisica (No Coriolis). \\ \hline
+\textbf{A} & 1 ($\Delta x \approx 10$km) & 60 & 1440 & Piatta 100m & Baseline \\ \hline
+\textbf{B} & 1 ($\Delta x \approx 10$km) & 60 & 1440 & Piatta 100m & $A_0 \in [0.1, 0.5, 1.0]$. Check Linearità. \\ \hline
+\textbf{C} & 1 ($\Delta x \approx 10$km) & 20 & 4320 & \begin{tabular}{@{}c@{}}Pendenza \\ $1000 \to 100$m\end{tabular} & Shoaling. $zdep\_min=100m$. \\ \hline
+\textbf{D} & 2 ($\Delta x \approx 5$km) & 20 & 4320 & Piatta 100m & Media Risoluzione. \\ \hline
+\textbf{E} & 1 ($\Delta x \approx 10$km) & 60 & 1440 & Piatta 100m & $f=0$. No Coriolis. \\ \hline
 \end{tabularx}
 \caption{Tabella riassuntiva delle configurazioni.}
 \label{tab:configs}

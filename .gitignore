@@ -17,9 +17,8 @@ __pycache__/
 # mesh_mask*.nc 
 
 # generated Figures
-postprocessing/*.png
-# Or ignore all pngs?
-# *.png
+*.png
+old_plot/
 
 # LaTeX Output
 *.aux

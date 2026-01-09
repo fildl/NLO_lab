@@ -81,13 +81,15 @@ def analyze_exp_c():
             hovmoller[t, j] = ssh[t, j, int(col)]
 
     plt.figure(figsize=(10, 8))
-    h_vmax = np.percentile(np.abs(hovmoller), 99)
-    if h_vmax == 0: h_vmax = 0.05
-    
-    plt.imshow(hovmoller, aspect='auto', origin='lower', cmap='RdBu_r', 
+    scale_mm = 1000.0
+    h_vmax = np.percentile(np.abs(hovmoller), 99) * scale_mm
+    print(f"Hovmoller Vmax (mm): {h_vmax}")
+    if h_vmax == 0: h_vmax = 1.0
+
+    plt.imshow(hovmoller * scale_mm, aspect='auto', origin='lower', cmap='RdBu_r', 
                vmin=-h_vmax, vmax=h_vmax,
                extent=[0, ny*10, 0, ssh.shape[0]*dt_c/3600]) # Approx 10km grid
-    plt.colorbar(label='SSH (m)')
+    plt.colorbar(label='SSH (mm)')
     plt.xlabel('Distance South-North (km approx)')
     plt.ylabel('Time (hours)')
     plt.title('Exp C: Hovmöller Diagram (Shoaling Check - 100m Slope)')
@@ -108,20 +110,23 @@ def analyze_exp_c():
     if not steps: steps = [0]
     
     selected_ssh = ssh[steps, :, :]
-    vmax_local = np.percentile(np.abs(selected_ssh), 99.9)
-    print(f"Exp C Vmax: {vmax_local}")
+    scale_mm = 1000.0
+    vmax_local = np.percentile(np.abs(selected_ssh), 99.9) * scale_mm
+    print(f"Exp C Vmax (mm): {vmax_local}")
     
     # Larger fonts
     plt.rcParams.update({'font.size': 14, 'axes.titlesize': 16, 'axes.labelsize': 14})
     
-    fig, axes = plt.subplots(1, 5, figsize=(15, 10), constrained_layout=True)
+    # Reduced height to minimize whitespace (similar to Exp A refinement)
+    # Matching Exp A exactly: (15, 8) with constrained_layout
+    fig, axes = plt.subplots(1, 5, figsize=(15, 8), constrained_layout=True)
     
     # Handle single plot case if only 1 step
     if len(steps) == 1: axes = [axes]
 
     for i, t_step in enumerate(steps):
         ax = axes[i]
-        data_step = ssh[t_step, :, :]
+        data_step = ssh[t_step, :, :] * scale_mm
         # Apply mask
         data_step = np.ma.masked_where(tmask == 0, data_step)
         
@@ -138,10 +143,12 @@ def analyze_exp_c():
         ax.set_title(f"T = {t_step*dt_c/3600:.1f} h")
         if i > 0: ax.set_yticklabels([])
 
-    fig.suptitle('Exp C: Kelvin Wave Propagation', fontsize=20)
+    # Match Exp A title position
+    fig.suptitle('Exp C: Kelvin Wave Propagation', fontsize=20, y=1.06)
     if 'im' in locals():
-        fig.colorbar(im, ax=axes, orientation='horizontal', fraction=0.05, pad=0.02, label='SSH (m)')
-    plt.savefig(os.path.join(script_dir, 'fig_ExpC_snapshots.png'), dpi=300)
+        # Match Exp A colorbar padding
+        fig.colorbar(im, ax=axes, orientation='horizontal', fraction=0.05, pad=0.03, label='SSH (mm)')
+    plt.savefig(os.path.join(script_dir, 'fig_ExpC_snapshots.png'), dpi=300, bbox_inches='tight')
     print("Saved fig_ExpC_snapshots.png")
 
     ds.close()
@@ -167,11 +174,12 @@ def analyze_exp_c():
         time_c = np.arange(len(ts_c)) * dt_c / 3600
         time_a = np.arange(len(ts_a)) * dt_a / 3600
         
-        plt.plot(time_c, ts_c, 'r-', label='Exp C (Slope: 100m)', linewidth=2)
-        plt.plot(time_a, ts_a, 'k--', label='Baseline (Flat: 100m)', linewidth=1.5)
+        scale_mm = 1000.0
+        plt.plot(time_c, ts_c * scale_mm, 'r-', label='Exp C (Slope: 100m)', linewidth=2)
+        plt.plot(time_a, ts_a * scale_mm, 'k--', label='Baseline (Flat: 100m)', linewidth=1.5)
         plt.title('Shoaling Effect: SSH at Northern Coast')
         plt.xlabel('Time (hours)')
-        plt.ylabel('SSH (m)')
+        plt.ylabel('SSH (mm)')
         plt.legend()
         plt.grid()
         plt.savefig(os.path.join(script_dir, 'fig_ExpC_shoaling_comparison.png'), dpi=300)
@@ -253,12 +261,13 @@ def analyze_exp_c():
         fig, axes = plt.subplots(1, 2, figsize=(14, 8), constrained_layout=True)
         
         # Common scaling
-        vmax = np.percentile(np.abs(hov_A), 99)
-        if vmax == 0: vmax = 0.05
+        vmax = np.percentile(np.abs(hov_A), 99) * 1000
+        if vmax == 0: vmax = 1.0
+        print(f"Comparison Vmax (mm): {vmax}")
     
         # 1. Exp A
         ax = axes[0]
-        im = ax.imshow(hov_A, aspect='auto', origin='lower', cmap='RdBu_r', vmin=-vmax, vmax=vmax,
+        im = ax.imshow(hov_A * 1000, aspect='auto', origin='lower', cmap='RdBu_r', vmin=-vmax, vmax=vmax,
                        extent=[0, hov_A.shape[1]*10, 0, hov_A.shape[0]*dt_a/3600])
         ax.set_title('Exp A: Flat Bottom (100m)\nConstant Speed -> Straight Line')
         ax.set_xlabel('Distance South-North (km approx)')
@@ -271,9 +280,9 @@ def analyze_exp_c():
     
         # 2. Exp C
         ax = axes[1]
-        vmax_c = np.percentile(np.abs(hov_C), 99)
+        vmax_c = np.percentile(np.abs(hov_C), 99) * 1000
         # Using symmetric vmin/vmax
-        im2 = ax.imshow(hov_C, aspect='auto', origin='lower', cmap='RdBu_r', vmin=-vmax_c, vmax=vmax_c,
+        im2 = ax.imshow(hov_C * 1000, aspect='auto', origin='lower', cmap='RdBu_r', vmin=-vmax_c, vmax=vmax_c,
                        extent=[0, hov_C.shape[1]*10, 0, hov_C.shape[0]*dt_c/3600])
         ax.set_title('Exp C: Sloping Bottom (1000m -> 100m)\nDecelerating -> Curved Line')
         ax.set_xlabel('Distance South-North (km approx)')
@@ -294,7 +303,7 @@ def analyze_exp_c():
         ax.plot(y_pts / 1000.0, t_hrs, 'k--', linewidth=2, label='Theory (variable depth)')
         ax.legend()
         
-        fig.colorbar(im, ax=axes, orientation='horizontal', fraction=0.05, pad=0.02, label='SSH (m)')
+        fig.colorbar(im, ax=axes, orientation='horizontal', fraction=0.05, pad=0.02, label='SSH (mm)')
         
         plt.savefig(os.path.join(script_dir, 'fig_ExpC_hovmoller_comparison.png'), dpi=300)
         print("Saved fig_ExpC_hovmoller_comparison.png")
