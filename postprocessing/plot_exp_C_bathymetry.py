@@ -202,7 +202,7 @@ def analyze_exp_c():
         cmap = 'viridis_r' # Reversed so deep (1000) is Purple/Dark, shallow (100) is Yellow/Light
         im = ax.pcolormesh(lon, lat, depth_grid, cmap=cmap, shading='auto')
         
-        ax.set_title('3D Bathymetry\n(Experiment C - 100m Slope)', fontsize=14)
+        ax.set_title('Experiment C Bathymetry', fontsize=14)
         ax.set_xlabel('Longitude (°E)')
         ax.set_ylabel('Latitude (°N)')
         ax.set_aspect('equal')
@@ -211,7 +211,7 @@ def analyze_exp_c():
         dmin, dmax = np.min(depth_grid), np.max(depth_grid)
         cbar = fig.colorbar(im, ax=ax, label='Depth (m)')
         cbar.set_ticks([dmin, 250, 500, 750, dmax])
-        cbar.set_ticklabels([f'{int(dmin)}m (North)', '250', '500', '750', f'{int(dmax)}m (South)'])
+        cbar.set_ticklabels([f'{int(dmin)}m', '250', '500', '750', f'{int(dmax)}m'])
         
         # Annotation removed as per user request
         

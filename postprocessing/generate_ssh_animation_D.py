@@ -5,8 +5,8 @@ import numpy as np
 import os
 
 # Configuration
-input_file = 'experiments/EXP_AMP_0.1m.nc'
-output_file = 'ssh_animation_expA.gif'
+input_file = 'experiments/EXP_D.nc'
+output_file = 'ssh_animation_expD.gif'
 fps = 15  # Frames per second
 
 # Get absolute paths
@@ -22,14 +22,21 @@ nav_lat = ds.variables['nav_lat'][:]
 time_steps = ssh.shape[0]
 print(f"Data shape: {ssh.shape}, Timesteps: {time_steps}")
 
-fig, ax = plt.subplots(figsize=(6, 8), constrained_layout=True)
-fig.suptitle('SSH Evolution\nEXP A (Baseline)', fontsize=16)
+# Exp D setup: dt = 20s (4320 steps for 24h)
+# Exp A had dt=60s and we skipped 10 frames (10 mins).
+# To have 10 mins per frame in Exp D (20s), we need step = 30.
+# 30 * 20s = 600s = 10 mins.
 
+fig, ax = plt.subplots(figsize=(6, 8), constrained_layout=True)
+fig.suptitle('SSH Evolution\nEXP D (High Res)', fontsize=16)
+
+# Scale: Exp D is flat bottom like Exp A.
+# Expected amplitudes should be similar to Exp A.
+# Exp A Vmax was 0.8 mm. Let's use 0.8 mm here too for comparison.
 vmax = 0.4
 vmin = -vmax
 
-# Use a mask for land/water if possible, or just plot everything
-# Baseline mask (zeros at boundaries) might be noisy, but let's just plot directly.
+# Use a mask if available, but for simplicity/robustness just plot all.
 
 im = ax.pcolormesh(nav_lon, nav_lat, ssh[0, :, :], cmap='RdBu_r', 
                        vmin=vmin, vmax=vmax, shading='auto')
@@ -43,17 +50,20 @@ time_text = ax.text(0.5, 1.02, '', transform=ax.transAxes, ha='center', fontsize
 def update(frame):
     im.set_array(ssh[frame, :, :].ravel())
     
-    # 60s timestep
-    hours = frame * 60 / 3600
+    # 20s timestep for Exp D
+    hours = frame * 20 / 3600
     time_text.set_text(f"Time: {hours:.2f} h")
     
-    if frame % 100 == 0:
+    if frame % 300 == 0:
         print(f"Processing frame {frame}/{time_steps}")
     return im, time_text
 
 print("Generating animation...")
-step = 10
-end_step = 1020 # 17 hours
+step = 30 # 10 minutes per frame (30 * 20s)
+# Limit to similar duration (17h like Exp A)
+# 17 * 3600 = 61200 s. 
+# Total steps for 17h: 61200 / 20 = 3060 steps.
+end_step = 3060
 frames = list(range(0, min(end_step + 1, time_steps), step))
 
 ani = animation.FuncAnimation(fig, update, frames=frames, blit=False, interval=50)

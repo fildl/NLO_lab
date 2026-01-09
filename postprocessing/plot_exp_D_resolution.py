@@ -12,6 +12,7 @@ file_A = 'EXP_AMP_0.1m.nc'  # Make sure this matches your local file
 path_A = os.path.join(work_dir, file_A)
 
 # Exp D (Medium Res)
+# Exp D (Medium Res)
 file_D = 'EXP_D.nc' # User provided filename
 path_D = os.path.join(work_dir, file_D)
 
@@ -38,10 +39,16 @@ def get_ssh_venice(filepath, label):
     
     if label == "Exp D":
         # Ensure we are picking physically comparable point
-        # A: (nx-2, ny-5) -> D: Scale indices by GYRE factor?
+        # A: (nx-2, ny-5) -> D: Scale indices by GYRE factor (2)
         # A: GYRE=1 -> H~22x8. D: GYRE=2 -> H~44x16.
-        # Ratio = 2.
-        # But let's just use grid logic: always take "near North-East corner".
+        # Theoretical Ratio = 2.
+        # To match (nx-2) from Exp A which is "East wall - 2 grid points":
+        # In D, keeping "2 grid points from wall" is fine physically (closer to wall),
+        # or we could do "4 grid points" to stay at same physical distance.
+        # Let's keep "2 grid points" index (nx-2) for consistency of "coastal" definition.
+        # But for J index (Latitude), we needed to be "a bit off the wall".
+        # Exp A: ny-5. Exp D: ny-10 would be physically similar? 
+        # Let's just use ny-5 to avoid boundary issues, it's far enough.
         pass
     
     print(f"[{label}] Extracting at index ({i_idx}, {j_idx}) from shape {ssh.shape}")
@@ -71,14 +78,16 @@ def analyze_resolution():
     # 2. Compare Time Series at Venice
     plt.figure(figsize=(12, 6))
     
+    scale_mm = 1000.0
+    
     if ssh_A is not None:
-        plt.plot(t_A, ssh_A, 'k--', label=f'Exp A (dx~10km, dt=60s)')
+        plt.plot(t_A, ssh_A * scale_mm, 'k--', label=f'Exp A (dx~10km, dt=60s)')
         
-    plt.plot(t_D, ssh_D, 'r-', linewidth=2, alpha=0.8, label=f'Exp D (dx~5km, dt=20s)')
+    plt.plot(t_D, ssh_D * scale_mm, 'r-', linewidth=2, alpha=0.8, label=f'Exp D (dx~5km, dt=20s)')
     
     plt.title('Effect of Resolution on Kelvin Wave (Northern End SSH)')
     plt.xlabel('Time (hours)')
-    plt.ylabel('SSH (m)')
+    plt.ylabel('SSH (mm)') # Correct unit
     plt.grid(True, alpha=0.3)
     plt.legend()
     plt.xlim(0, 24)
@@ -106,19 +115,21 @@ def analyze_resolution():
     hov_D = ssh_full_D[:, :, idx_path]
     
     plt.figure(figsize=(10, 8))
-    vmax = np.percentile(np.abs(hov_D), 99)
-    if vmax==0: vmax=0.05
+    scale_mm = 1000.0
+    vmax = np.percentile(np.abs(hov_D), 99) * scale_mm
+    print(f"Exp D Vmax (mm): {vmax}")
+    if vmax==0: vmax=1.0
     
     # dt=20s
     extent = [0, ny_D, 0, hov_D.shape[0]*20.0/3600.0] 
     
-    plt.imshow(hov_D, aspect='auto', origin='lower', cmap='RdBu_r', 
+    plt.imshow(hov_D * scale_mm, aspect='auto', origin='lower', cmap='RdBu_r', 
                vmin=-vmax, vmax=vmax, extent=extent)
     
     plt.xlabel('Distance Index (South -> North)')
     plt.ylabel('Time (hours)')
     plt.title('Exp D: Hovmöller (Medium Res 5km)')
-    plt.colorbar(label='SSH (m)')
+    plt.colorbar(label='SSH (mm)')
     
     out_hov = os.path.join(script_dir, 'fig_ExpD_hovmoller.png')
     plt.savefig(out_hov, dpi=300)
