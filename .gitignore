@@ -30,6 +30,7 @@ old_plot/
 *.synctex.gz
 *.pdf
 postprocessing/docs/latex_aux/
+*.bib
 
 # NEMO Build Artifacts
 TIDES/BLD/
