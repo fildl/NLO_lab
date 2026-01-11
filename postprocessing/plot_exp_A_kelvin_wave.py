@@ -116,7 +116,7 @@ def analyze_wave():
         
         ax_path.plot(path_lons, path_lats, 'r-', linewidth=2, label='Hovmöller Path')
         ax_path.legend(loc='upper right')
-        ax_path.set_title('Exp A: Extraction Path')
+        ax_path.set_title('Extraction Path')
         ax_path.set_xlabel('Longitude (°E)')
         ax_path.set_ylabel('Latitude (°N)')
         ax_path.set_aspect('equal')

@@ -206,7 +206,7 @@
         \begin{column}{0.6\textwidth}
             \begin{figure}
                 \centering
-                \includegraphics[height=0.5\textheight,keepaspectratio]{../postprocessing/fig_expB_compare_linearity.png}
+                \includegraphics[width=\linewidth,height=0.5\textheight,keepaspectratio]{../postprocessing/fig_expB_compare_linearity.png}
             \end{figure}
         \end{column}
     \end{columns}
@@ -280,12 +280,27 @@
 % Slide 10: Exp D - Sensibilità alla Risoluzione
 % -----------------------------------------------------------------------------
 \begin{frame}{Exp D: Alta Risoluzione (5km)}
-    Confronto tra $\Delta x = 10$ km (Baseline) e $\Delta x = 5$ km.
+    Confronto tra $\Delta x = 10$ km (Baseline) e $\Delta x = 5$ km:
+    \begin{itemize}
+        \item Aumento della risoluzione temporale ($\Delta t$ = 20 s) per stabilità.
+        \item L'alta risoluzione riduce la dissipazione numerica (picchi più marcati).
+        \item La velocità di fase e la struttura dell'onda rimangono coerenti.
+    \end{itemize}
     
-    \begin{figure}
-        \centering
-        \includegraphics[width=0.75\textwidth]{../postprocessing/fig_ExpD_resolution_comparison.png}
-    \end{figure}
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \begin{figure}
+                \centering
+                \includegraphics[width=\linewidth,height=0.6\textheight,keepaspectratio]{../postprocessing/fig_ExpD_resolution_comparison.png}
+            \end{figure}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{figure}
+                \centering
+                \includegraphics[width=\linewidth,height=0.6\textheight,keepaspectratio]{../postprocessing/fig_ExpD_hovmoller.png}
+            \end{figure}
+        \end{column}
+    \end{columns}
 \end{frame}
 
 % -----------------------------------------------------------------------------

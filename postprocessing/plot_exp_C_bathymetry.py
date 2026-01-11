@@ -88,7 +88,7 @@ def analyze_dataset(config):
     plt.colorbar(label='SSH (mm)')
     plt.xlabel('Distance along the coast (km)')
     plt.ylabel('Time (hours)')
-    plt.title(f'Exp C ({filename}): Hovmöller Diagram')
+    plt.title(f'Hovmöller Diagram (East Coast Path)')
 
     # Theoretical Curve for Exp C (Slope)
     # H(y) = 1000 - (1000-100) * y / L
@@ -152,7 +152,7 @@ def analyze_dataset(config):
         if i > 0: ax.set_yticklabels([])
 
     # Match Exp A title position
-    fig.suptitle(f'Exp C ({filename}): Kelvin Wave Propagation', fontsize=20, y=1.06)
+    fig.suptitle(f'Kelvin Wave Propagation', fontsize=20, y=1.06)
     if 'im' in locals():
         # Match Exp A colorbar padding
         fig.colorbar(im, ax=axes, orientation='horizontal', fraction=0.05, pad=0.03, label='SSH (mm)')
@@ -185,7 +185,7 @@ def analyze_dataset(config):
         scale_mm = 1000.0
         plt.plot(time_c, ts_c * scale_mm, 'r-', label=f'Exp C {suffix} (Slope: 100m)', linewidth=2)
         plt.plot(time_a, ts_a * scale_mm, 'k--', label='Baseline (Flat: 100m)', linewidth=1.5)
-        plt.title(f'Shoaling Effect: SSH at Northern Coast ({filename})')
+        plt.title(f'Shoaling Effect: SSH at Northern Coast')
         plt.xlabel('Time (hours)')
         plt.ylabel('SSH (mm)')
         plt.legend()

@@ -97,7 +97,7 @@ def compare_runs_20km():
         plt.xlabel('I Index')
         plt.ylabel('J Index')
         
-    plt.title('Exp B: Monitoring Location')
+    plt.title('Monitoring Location')
     plt.legend(loc='lower left')
     plt.axis('equal')
     plt.tight_layout()
