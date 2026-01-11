@@ -13,8 +13,6 @@ __pycache__/
 
 # Simulation Data (Large)
 *.nc
-# Keep mesh mask if intended to be tracked? Usually not if large/generated
-# mesh_mask*.nc 
 
 # generated Figures
 *.png
@@ -31,6 +29,7 @@ old_plot/
 *.pdf
 postprocessing/docs/latex_aux/
 *.bib
+*.nav
 
 # NEMO Build Artifacts
 TIDES/BLD/

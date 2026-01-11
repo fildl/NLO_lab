@@ -264,16 +264,24 @@
 % Slide 9: Exp C - Deformazione e Rossby Radius
 % -----------------------------------------------------------------------------
 \begin{frame}{Exp C: Dinamica e Raggio di Rossby}
-    \begin{itemize}
-        \item \textbf{Exp A (100m):} $R_d \approx 300$ km. Onda confinata alla costa.
-        \item \textbf{Exp C (1000m):} $R_d \approx 1000$ km. Onda a scala di bacino.
-    \end{itemize}
-    In acque profonde il raggio di Rossby supera la larghezza del bacino: l'onda perde il carattere costiero "stretto".
-    
-    \begin{figure}
-        \centering
-        \includegraphics[width=0.9\textwidth]{../postprocessing/fig_ExpC_snapshots_1core.png}
-    \end{figure}
+    \begin{columns}
+        \begin{column}{0.45\textwidth}
+            \begin{figure}
+                \centering
+                \includegraphics[width=0.9\linewidth,height=0.45\textheight,keepaspectratio]{../postprocessing/fig_expA_initial_state.png}
+                \vspace{0.2cm}
+                \includegraphics[width=0.9\linewidth,height=0.45\textheight,keepaspectratio]{../postprocessing/fig_expC_1core_initial_state.png}
+            \end{figure}
+        \end{column}
+        \begin{column}{0.55\textwidth}
+            \begin{itemize}
+                \item \textbf{Exp A (100m):} $R_d \approx 300$ km. Onda confinata alla costa.
+                \item \textbf{Exp C (1000m):} $R_d \approx 1000$ km. Onda a scala di bacino.
+            \end{itemize}
+            \vspace{0.5cm}
+            In acque profonde il raggio di Rossby supera la larghezza del bacino: l'onda perde il carattere costiero "stretto".
+        \end{column}
+    \end{columns}
 \end{frame}
 
 % -----------------------------------------------------------------------------
@@ -288,13 +296,13 @@
     \end{itemize}
     
     \begin{columns}
-        \begin{column}{0.5\textwidth}
+        \begin{column}{0.55\textwidth}
             \begin{figure}
                 \centering
                 \includegraphics[width=\linewidth,height=0.6\textheight,keepaspectratio]{../postprocessing/fig_ExpD_resolution_comparison.png}
             \end{figure}
         \end{column}
-        \begin{column}{0.5\textwidth}
+        \begin{column}{0.45\textwidth}
             \begin{figure}
                 \centering
                 \includegraphics[width=\linewidth,height=0.6\textheight,keepaspectratio]{../postprocessing/fig_ExpD_hovmoller.png}
@@ -307,16 +315,23 @@
 % Slide 11: Exp E - Validazione Fisica ($f=0$)
 % -----------------------------------------------------------------------------
 \begin{frame}{Exp E: Ruolo della Rotazione}
-    \textbf{Test:} Rimozione della forza di Coriolis ($f=0$).
-    \begin{itemize}
-        \item L'onda non è più intrappolata alla costa (Kelvin).
-        \item Si propaga come un'onda di gravità isotropa e decade rapidamente.
-    \end{itemize}
-
-    \begin{figure}
-        \centering
-        \includegraphics[width=0.9\textwidth]{../postprocessing/fig_ExpE_snapshots.png}
-    \end{figure}
+    \begin{columns}
+        \begin{column}{0.45\textwidth}
+            \begin{figure}
+                \centering
+                \includegraphics[width=0.9\linewidth,height=0.45\textheight,keepaspectratio]{../postprocessing/fig_expA_initial_state.png}
+                \vspace{0.2cm}
+                \includegraphics[width=0.9\linewidth,height=0.45\textheight,keepaspectratio]{../postprocessing/fig_expA_initial_state.png}
+            \end{figure}
+        \end{column}
+        \begin{column}{0.55\textwidth}
+            \textbf{Test:} Rimozione della forza di Coriolis ($f=0$).
+            \begin{itemize}
+                \item L'onda non è più intrappolata alla costa (Kelvin).
+                \item Si propaga come un'onda di gravità isotropa e decade rapidamente.
+            \end{itemize}
+        \end{column}
+    \end{columns}
 \end{frame}
 
 % -----------------------------------------------------------------------------
@@ -325,15 +340,11 @@
 \begin{frame}{Conclusioni}
     \begin{enumerate}
         \setlength{\itemsep}{1em}
-        \item \textbf{Dinamica Kelvin}: Il modello riproduce correttamente l'onda di Kelvin e il punto anfidromico (Exp A).
-        \item \textbf{Linearità}: Risposta perfettamente lineare per ampiezze fisiche (Exp B).
-        \item \textbf{Topografia}: La batimetria controlla la velocità di fase ($c=\sqrt{gH}$), con ottimo accordo teorico (Exp C).
+        \item \textbf{Dinamica Kelvin}: Il modello riproduce correttamente l'onda di Kelvin e lo sviluppo di un punto anfidromico (Exp A, D).
+        \item \textbf{Linearità}: Risposta perfettamente lineare al variare  dell'ampiezza (Exp B).
+        \item \textbf{Topografia}: La velocità di fase dell'onda mostra una dipendenza dalla profondità ($c=\sqrt{gH}$) in accordo con la teoria (Exp C).
         \item \textbf{Fisica}: Il confinamento costiero è un effetto esclusivo della rotazione (Exp E).
     \end{enumerate}
-    
-    \vspace{1cm}
-    \centering
-    \large \textbf{Grazie per l'attenzione!}
 \end{frame}
 
 \end{document}
