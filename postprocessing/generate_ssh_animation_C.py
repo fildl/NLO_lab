@@ -39,7 +39,7 @@ def generate_animation(config):
     # 30 * 20s = 600s = 10 mins.
 
     fig, ax = plt.subplots(figsize=(5, 8), constrained_layout=True)
-    fig.suptitle(f'SSH Evolution\nEXP C (Slope 1000m->100m){title_suffix}', fontsize=16)
+    fig.suptitle(f'SSH Evolution\nEXP C (Slope 1000m->100m)', fontsize=16)
 
     # Scale adjustment: Previous plot_exp_C_bathymetry showed Vmax around 0.54 mm.
     # But shoaling might produce higher transient peaks.
